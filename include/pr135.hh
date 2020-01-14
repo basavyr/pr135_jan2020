@@ -19,10 +19,19 @@ public:
         double spin, energy;
     };
 
+    struct reducedProbabilities
+    {
+        double BE2out_BE2in;
+        double BM1OUT_BE2in;
+        double delta;
+    };
+
     //containers to store the experimental data (spin and energy)
-    std::vector<band> exp1;
+    std::vector<band> band1;
     //containers to store the experimental data (spin and energy)
-    std::vector<band> exp2;
+    std::vector<band> band2;
+    //containers to store the experimental data for electromagnetic transitions;
+    std::vector<reducedProbabilities> transitions;
 
     std::vector<band> data1Exp(Pr135Experimental &);
     std::vector<band> data2Exp(Pr135Experimental &);
