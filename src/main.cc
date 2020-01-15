@@ -5,7 +5,7 @@
 
 #include "../include/pr135.hh"
 #include "../include/data.hh"
-
+#include "../include/energyExpressions.hh"
 int main()
 {
     //ENSDF DATA
@@ -23,6 +23,5 @@ int main()
     delete nucleu;
     v1.clear();
     v2.clear();
-
     return 0;
 }
