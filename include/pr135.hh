@@ -42,4 +42,15 @@ public:
     static void newLine();
 };
 
+class Pr135Theoretical
+{
+public:
+    struct band
+    {
+        double spin, energy;
+    };
+    std::vector<band> band1;
+    std::vector<band> band2;
+};
+
 #endif // PR135_HH

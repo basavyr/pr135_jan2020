@@ -6,6 +6,7 @@
 #include "../include/pr135.hh"
 #include "../include/data.hh"
 
+//fetches the experimental data from C arrays into container object BAND
 void Pr135Experimental::init_ENSDF(Pr135Experimental &obj)
 {
     //ENSDF DATA
@@ -27,6 +28,7 @@ void Pr135Experimental::init_ENSDF(Pr135Experimental &obj)
     }
 }
 
+//fetches the experimental data from C arrays into container object BAND
 void Pr135Experimental::init_MATTA(Pr135Experimental &obj)
 {
     //MATTA DATA
