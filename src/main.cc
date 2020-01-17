@@ -46,46 +46,35 @@ std::vector<T> band2(Pr135Experimental &obj, EnergyFormula &energy, double param
 }
 
 //ensdf data initialization
-void _init(Pr135Experimental &obj)
+void _init(Pr135Experimental &nucleus, EnergyFormula &formulas)
 {
-    obj.init_ENSDF(obj);
+    nucleus.init_ENSDF(nucleus);
+
+    //band1
+    formulas.normalize(nucleus.band1);
+    formulas.kevTOmevBand<double>(nucleus.band1);
+
+    //band2
+    formulas.normalize(nucleus.band2);
+    formulas.kevTOmevBand<double>(nucleus.band2);
+
+    nucleus.printer(nucleus.band1);
+    nucleus.printer(nucleus.band2);
 }
 
 int main()
 {
     //ENSDF DATA
     Pr135Experimental *nucleus = new Pr135Experimental;
-    ChiSquared *cs = new ChiSquared;
+    ChiSquared *chisquared = new ChiSquared;
     EnergyFormula *formulas = new EnergyFormula;
     MinimumValueParameter *paramSet = new MinimumValueParameter;
 
-    _init(*nucleus);
-    //band1
-    formulas->normalize(nucleus->band1);
-    formulas->kevTOmevBand<double>(nucleus->band1);
-    // nucleus->printer(nucleus->band1);
-    std::cout << cs->apply_Yrast<double>(*nucleus) << "\n";
-    //band2
-    formulas->normalize(nucleus->band2);
-    formulas->kevTOmevBand<double>(nucleus->band2);
-    // nucleus->printer(nucleus->band2);
-    std::cout << cs->apply_Wobbling<double>(*nucleus) << "\n";
+    _init(*nucleus, *formulas);
+    std::cout << paramSet->calculateMinimumValue<double>(*nucleus, *formulas, *chisquared);
 
     delete nucleus;
-    delete cs;
+    delete chisquared;
     delete formulas;
     delete paramSet;
-
-    // std::vector<double> v1 = band1<double>(*nucleus, *formulas);
-
-    /*  
-    auto x = nucleus->data1Exp(*nucleus);
-    auto xx = formulas->normalize<double>(x);
-    formulas->kevTOmev(xx);
-    */
-
-    // std::vector<double> exp2 = apply<double>(*nucleus);
-    // formulas->normalize(nucleus->band1);
-    // formulas->kevTOmevBand<double>(nucleus->band1);
-    // Pr135Experimental::printer(nucleus->band1);
 }

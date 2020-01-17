@@ -4,6 +4,8 @@
 #include <vector>
 #include <cmath>
 #include "../include/pr135.hh"
+#include <iostream>
+#include <chrono>
 
 class EnergyFormula
 {
@@ -74,6 +76,7 @@ public:
     {
         if (exp.size() != th.size())
             return static_cast<T>(0);
+        auto n = exp.size();
         T retval = static_cast<T>(0);
         for (int i = 0; i < exp.size(); ++i)
         {
@@ -81,9 +84,12 @@ public:
             if (isValid(elem))
             {
                 retval += elem;
+                n--;
             }
         }
-        return sqrt(retval / exp.size());
+        if (!n)
+            return sqrt(retval / exp.size());
+        return 987654321;
     }
 
     template <typename T>
@@ -92,23 +98,49 @@ public:
         return 0;
     }
 
-    template <typename T>
-    T apply_Yrast(Pr135Experimental &nucleus)
-    {
-        auto yrast = [](auto spin, auto param) {
-            return EnergyFormula::yrastBand(static_cast<double>(spin), static_cast<double>(param));
-        };
-        return yrast(nucleus.band1.at(0).spin, 1);
-    }
+    //sum implementation
 
     template <typename T>
-    T apply_Wobbling(Pr135Experimental &nucleus)
+    T apply(Pr135Experimental &nucleus, double param)
     {
-        auto wobbling = [](auto spin, auto param) {
+        std::vector<T> dataExp;
+        std::vector<T> dataTh;
+        auto yrast = [&param](auto spin) {
+            return EnergyFormula::yrastBand(static_cast<double>(spin), static_cast<double>(param));
+        };
+        auto wobbling = [&param](auto spin) {
             return EnergyFormula::wobblingBand(static_cast<double>(spin), static_cast<double>(param));
         };
-        return wobbling(nucleus.band2.at(0).spin, 1);
+        auto squaredDiff = [](auto x, auto y) {
+            return pow((x - y), 2);
+        };
+
+        //add the exp data and th data for first band
+        for (int i = 0; i < nucleus.band1.size(); ++i)
+        {
+            dataExp.emplace_back(static_cast<T>(nucleus.band1.at(i).energy));
+            dataTh.emplace_back(static_cast<T>(yrast(nucleus.band1.at(i).spin)));
+        }
+
+        //add the exp data and th data for the second
+        for (int i = 0; i < nucleus.band2.size(); ++i)
+        {
+            dataExp.emplace_back(static_cast<T>(nucleus.band2.at(i).energy));
+            dataTh.emplace_back(static_cast<T>(wobbling(nucleus.band2.at(i).spin)));
+        }
+
+        auto chiVal = meanSquaredError(dataExp, dataTh);
+        return static_cast<T>(chiVal);
     }
+
+    // template <typename T>
+    // T apply_Wobbling(Pr135Experimental &nucleus)
+    // {
+    //     auto wobbling = [](auto spin, auto param) {
+    //         return EnergyFormula::wobblingBand(static_cast<double>(spin), static_cast<double>(param));
+    //     };
+    //     return wobbling(nucleus.band2.at(0).spin, 1);
+    // }
 
 public:
     template <typename T>
@@ -124,10 +156,38 @@ class MinimumValueParameter
 {
 public:
     template <typename T>
-    T calculateMinimumValue(Pr135Experimental &nucleus, EnergyFormula &formulas)
+    T calculateMinimumValue(Pr135Experimental &nucleus, EnergyFormula &formulas, ChiSquared &chi)
     {
-        auto retval = 0;
-        return retval;
+        auto start = std::chrono::system_clock::now();
+        std::vector<T>
+            chi_Stack;
+        bool ok = 1;
+        T minvalue;
+        for (double param = -5000; param <= 5000 && ok; param += 0.001)
+        {
+            auto currentChi = chi.apply<T>(nucleus, param);
+            if (isnan(currentChi))
+            {
+                break;
+                ok = 0;
+            }
+            else
+            {
+                chi_Stack.emplace_back(currentChi);
+            }
+        } /* 
+        for (auto &&i : chi_Stack)
+        {
+            std::cout << i << " ";
+        } */
+        // std::cout << std::endl;
+        auto index = std::distance(chi_Stack.begin(), std::min_element(chi_Stack.begin(), chi_Stack.end()));
+        minvalue = chi_Stack.at(static_cast<int>(index));
+        auto end = std::chrono::system_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        std::cout << "minvalue evaluation took " << static_cast<double>(duration / 1000) << " seconds...";
+        std::cout << "\n";
+        return minvalue;
     }
 };
 
