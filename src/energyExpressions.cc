@@ -9,7 +9,7 @@ double EnergyFormula::yrastBand(double spin, double params)
 
 double EnergyFormula::wobblingBand(double spin, double params)
 {
-    return 2 * params * spin * spin + spin;
+    return params * spin * spin + spin;
 }
 
 // template <typename T>

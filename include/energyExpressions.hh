@@ -163,9 +163,20 @@ public:
             chi_Stack;
         bool ok = 1;
         T minvalue;
-        for (double param = -5000; param <= 5000 && ok; param += 0.001)
+
+        //set of params for the energy fit
+        struct minimumSetOfParams
         {
-            auto currentChi = chi.apply<T>(nucleus, param);
+            double param1;
+            double param1_left = -5.0;
+            double param1_right = 5.0;
+            double param1_step = 0.13;
+        };
+        minimumSetOfParams min_set;
+
+        for (double param1 = min_set.param1_left; param1 <= min_set.param1_right && ok; param1 += min_set.param1_step)
+        {
+            auto currentChi = chi.apply<T>(nucleus, param1);
             if (isnan(currentChi))
             {
                 break;
@@ -187,6 +198,8 @@ public:
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
         std::cout << "minvalue evaluation took " << static_cast<double>(duration / 1000) << " seconds...";
         std::cout << "\n";
+        std::cout << "index of the minimum in the stack is " << index << "\n";
+        std::cout << "the value of param1 is " << static_cast<double>(min_set.param1_left + (index * min_set.param1_step)) << "\n ";
         return minvalue;
     }
 };
