@@ -35,13 +35,29 @@ double EnergyFormula::energyExpression(int N, double spin, double a1, double a2,
     auto j1 = j_Component(1, theta);
     auto j2 = j_Component(2, theta);
 
-    auto term1 = a1 * spin * spin + (2.0 * spin + 1.0) * a1 * j1 - spin * a2 * j2;
+    //get the INERTIA FACTORS FROM THE MOMENTS OF INERTIA
+    auto A1 = EnergyFormula::inertiaFactor(a1);
+    auto A2 = EnergyFormula::inertiaFactor(a2);
+    auto A3 = EnergyFormula::inertiaFactor(a3);
+
+    auto term1 = A1 * spin * spin + (2.0 * spin + 1.0) * A1 * j1 - spin * A2 * j2;
     auto term2 = omega(spin, a1, a2, a3, theta) * (N + 0.5);
-    auto sum = a1 * j1 * j1 + a2 * j2 * j2;
+
+    //checking for complex numers
+    if (!term2)
+        std::cout << "found complex number at..." << spin << " and params { " << a1 << " " << a2 << " " << a3 << " " << theta << " } "
+                  << "\n";
+
+    auto sum = A1 * j1 * j1 + A2 * j2 * j2;
     auto retval = static_cast<double>(term1 + term2 + sum);
     if (!isnan(retval))
         return retval;
     return 0;
+}
+
+double EnergyFormula::inertiaFactor(double a)
+{
+    return 1.0 / (2.0 * a);
 }
 
 double EnergyFormula::omega(double spin, double a1, double a2, double a3, double theta)
@@ -54,11 +70,18 @@ double EnergyFormula::omega(double spin, double a1, double a2, double a3, double
     auto j1 = j_Component(1, theta);
     auto j2 = j_Component(2, theta);
 
-    auto term1 = (2.0 * spin + 1.0) * (a2 - a1 - static_cast<double>((a2 * j2) / spin)) - 2.0 * a1 * j1;
-    auto term2 = (2.0 * spin + 1.0) * (a3 - a1) - 2.0 * a1 * j1;
-    auto term3 = (a3 - a1) * (a2 - a1 - static_cast<double>((a2 * j2) / spin));
+    //get the INERTIA FACTORS FROM THE MOMENTS OF INERTIA
+    auto A1 = EnergyFormula::inertiaFactor(a1);
+    auto A2 = EnergyFormula::inertiaFactor(a2);
+    auto A3 = EnergyFormula::inertiaFactor(a3);
+
+    auto term1 = (2.0 * spin + 1.0) * (A2 - A1 - static_cast<double>((A2 * j2) / spin)) - 2.0 * A1 * j1;
+    auto term2 = (2.0 * spin + 1.0) * (A3 - A1) - 2.0 * A1 * j1;
+    auto term3 = (A3 - A1) * (A2 - A1 - static_cast<double>((A2 * j2) / spin));
+
     // std::cout << "\n";
     // std::cout << "in omega... " << term1 << " " << term2 << " " << term3 << "\n";
+
     auto retval = static_cast<double>(sqrt(term1 * term2 - term3));
     if (!isnan(retval))
         return retval;

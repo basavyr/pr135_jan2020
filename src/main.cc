@@ -80,19 +80,29 @@ int main()
 
     for (auto &&n : nucleus->band1)
     {
-        std::cout << n.spin << " " << EnergyFormula::omega(n.spin, 1.0, 2.0, 3.0, 4.0) << " " << EnergyFormula::yrastBand(n.spin, 1, 2, 3, 4) << "\n";
-        // std::cout << n.spin << " " << EnergyFormula::omega(n.spin, 1.0, 2.0, 3.0, 4.0) << "\n";
+        auto I1 = 100;
+        auto I2 = 10;
+        auto I3 = 40;
+        auto A1 = EnergyFormula::inertiaFactor(static_cast<double>(I1));
+        auto A2 = EnergyFormula::inertiaFactor(static_cast<double>(I2));
+        auto A3 = EnergyFormula::inertiaFactor(static_cast<double>(I3));
+        auto theta = 26.0;
+        std::cout << A1 << " " << A2 << " " << A3 << " " << formulas->omega(n.spin, I1, I2, I3, theta) << " " << formulas->yrastBand(n.spin, I1, I2, I3, theta);
+        std::cout << "\n";
     }
     std::cout << "\n";
 
     for (auto &&n : nucleus->band2)
     {
-        std::cout << n.spin << " " << EnergyFormula::omega(n.spin, 1, 2, 3, 4) << " " << EnergyFormula::wobblingBand(n.spin, 1, 2, 3, 4) << "\n";
-    }
-
-    for (int i = 0; i <= 180; ++i)
-    {
-        // std::cout << i << " " << EnergyFormula::j_Component(1, i) << " " << EnergyFormula::j_Component(2, i) << "\n";
+        auto I1 = 100;
+        auto I2 = 10;
+        auto I3 = 40;
+        auto A1 = EnergyFormula::inertiaFactor(static_cast<double>(I1));
+        auto A2 = EnergyFormula::inertiaFactor(static_cast<double>(I2));
+        auto A3 = EnergyFormula::inertiaFactor(static_cast<double>(I3));
+        auto theta = 26.0;
+        std::cout << A1 << " " << A2 << " " << A3 << " " << formulas->omega(n.spin, I1, I2, I3, theta) << " " << formulas->wobblingBand(n.spin, I1, I2, I3, theta);
+        std::cout << "\n";
     }
 
     delete nucleus;

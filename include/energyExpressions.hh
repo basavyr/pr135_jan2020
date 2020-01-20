@@ -22,6 +22,8 @@ public:
 
     static double j_Component(int n, double theta);
 
+    static double inertiaFactor(double a);
+
     //normalize to first state in yrast band
     template <typename T>
     std::vector<T> normalize(std::vector<Pr135Experimental::band> &vec)
@@ -75,12 +77,12 @@ public:
     struct ParameterSet
     {
         // double A1, A2, A3;
-        double A_left = 0.0;
-        double A_right = 120.0;
-        double A_step = 5;
-        double theta_left = 0.0;
-        double theta_right = 180.0;
-        double theta_step = 5.0;
+        const double A_left = 0.0;
+        const double A_right = 120.0;
+        const double A_step = 5;
+        const double theta_left = 0.0;
+        const double theta_right = 180.0;
+        const double theta_step = 5.0;
         // double theta;
     };
 };
@@ -173,16 +175,16 @@ public:
         minimumSetOfParams min_set;
         EnergyFormula::ParameterSet params;
 
-        for (double A1 = params.A_left; A1 <= params.A_right && ok; A1 += params.A_step)
+        for (double I1 = params.A_left; I1 <= params.A_right && ok; I1 += params.A_step)
         {
-            for (double A2 = params.A_left; A2 <= params.A_right && ok; A2 += params.A_step)
+            for (double I2 = params.A_left; I2 <= params.A_right && ok; I2 += params.A_step)
             {
-                for (double A3 = params.A_left; A3 <= params.A_right && ok; A3 += params.A_step)
+                for (double I3 = params.A_left; I3 <= params.A_right && ok; I3 += params.A_step)
                 {
                     {
                         for (double theta = params.theta_left; theta <= params.theta_right && ok; theta += params.theta_step)
                         {
-                            auto currentChi = chi.applyEnergies<T>(nucleus, A1, A2, A3, theta);
+                            auto currentChi = chi.applyEnergies<T>(nucleus, I1, I2, I3, theta);
                             if (isnan(currentChi))
                             {
                                 break;
