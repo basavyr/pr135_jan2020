@@ -40,6 +40,9 @@ public:
 public:
     static void printer(std::vector<band> &);
     static void newLine();
+
+    //printer function for mathematica output
+    static void mathPrinter(std::vector<band> &);
 };
 
 class Pr135Theoretical

@@ -13,6 +13,8 @@ public:
     static constexpr double gamma = 26.0;
     //number of states that have exp values for transition probabilities
     static constexpr int noTransitions = 3;
+    static constexpr double oddSpin = 5.5;
+    static constexpr double PI = 3.14159265358979;
 };
 
 //experimental data for the Pr135 energies (taken from ENSDF data)

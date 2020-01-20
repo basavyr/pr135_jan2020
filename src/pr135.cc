@@ -64,6 +64,21 @@ void Pr135Experimental::printer(std::vector<Pr135Experimental::band> &array)
     }
 }
 
+void Pr135Experimental::mathPrinter(std::vector<Pr135Experimental::band> &array)
+{
+    std::cout << "{ ";
+    for (int i = 0; i < array.size(); ++i)
+    {
+        if (i == array.size() - 1)
+        {
+            std::cout << array.at(i).energy;
+            break;
+        }
+        std::cout << array.at(i).energy << " , ";
+    }
+    std::cout << "};\n";
+}
+
 std::vector<Pr135Experimental::band> Pr135Experimental::data1Exp(Pr135Experimental &obj)
 {
     std::vector<Pr135Experimental::band> retval;

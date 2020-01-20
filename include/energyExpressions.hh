@@ -11,10 +11,16 @@ class EnergyFormula
 {
 public:
     //N=0 wobbling band
-    static double yrastBand(double, double);
+    static double yrastBand(double spin, double a1, double a2, double a3, double theta);
 
     //N=1 wobbling band
-    static double wobblingBand(double, double);
+    static double wobblingBand(double spin, double a1, double a2, double a3, double theta);
+
+    static double omega(double spin, double a1, double a2, double a3, double theta);
+
+    static double energyExpression(int N, double spin, double a1, double a2, double a3, double theta);
+
+    static double j_Component(int n, double theta);
 
     //normalize to first state in yrast band
     template <typename T>
@@ -66,6 +72,17 @@ public:
         retval = 0.5 * spin + param1 * spin;
         return retval;
     }
+    struct ParameterSet
+    {
+        // double A1, A2, A3;
+        double A_left = 0.0;
+        double A_right = 120.0;
+        double A_step = 5;
+        double theta_left = 0.0;
+        double theta_right = 180.0;
+        double theta_step = 5.0;
+        // double theta;
+    };
 };
 
 class ChiSquared
@@ -75,7 +92,7 @@ public:
     T meanSquaredError(std::vector<T> &exp, std::vector<T> &th)
     {
         if (exp.size() != th.size())
-            return static_cast<T>(0);
+            return 0;
         auto n = exp.size();
         T retval = static_cast<T>(0);
         for (int i = 0; i < exp.size(); ++i)
@@ -92,27 +109,18 @@ public:
         return 987654321;
     }
 
+    //generate the two containers for computing the RMS.
+    //experimental and theoretical containers with the excitation energies
     template <typename T>
-    T meanSquaredError(std::vector<Pr135Experimental::band> &exp, std::vector<Pr135Theoretical::band> &th)
-    {
-        return 0;
-    }
-
-    //sum implementation
-
-    template <typename T>
-    T apply(Pr135Experimental &nucleus, double param)
+    T applyEnergies(Pr135Experimental &nucleus, double a1, double a2, double a3, double theta)
     {
         std::vector<T> dataExp;
         std::vector<T> dataTh;
-        auto yrast = [&param](auto spin) {
-            return EnergyFormula::yrastBand(static_cast<double>(spin), static_cast<double>(param));
+        auto yrast = [&](auto spin) {
+            return EnergyFormula::yrastBand(static_cast<double>(spin), a1, a2, a3, theta);
         };
-        auto wobbling = [&param](auto spin) {
-            return EnergyFormula::wobblingBand(static_cast<double>(spin), static_cast<double>(param));
-        };
-        auto squaredDiff = [](auto x, auto y) {
-            return pow((x - y), 2);
+        auto wobbling = [&](auto spin) {
+            return EnergyFormula::wobblingBand(static_cast<double>(spin), a1, a2, a3, theta);
         };
 
         //add the exp data and th data for first band
@@ -133,15 +141,6 @@ public:
         return static_cast<T>(chiVal);
     }
 
-    // template <typename T>
-    // T apply_Wobbling(Pr135Experimental &nucleus)
-    // {
-    //     auto wobbling = [](auto spin, auto param) {
-    //         return EnergyFormula::wobblingBand(static_cast<double>(spin), static_cast<double>(param));
-    //     };
-    //     return wobbling(nucleus.band2.at(0).spin, 1);
-    // }
-
 public:
     template <typename T>
     bool isValid(T arg)
@@ -155,53 +154,66 @@ public:
 class MinimumValueParameter
 {
 public:
+    //the minimal set of params for the energy fit
+    struct minimumSetOfParams
+    {
+        double A1_min;
+        double A2_min;
+        double A3_min;
+        double theta_min;
+    };
+
     template <typename T>
     T calculateMinimumValue(Pr135Experimental &nucleus, EnergyFormula &formulas, ChiSquared &chi)
     {
         auto start = std::chrono::system_clock::now();
-        std::vector<T>
-            chi_Stack;
+        std::vector<T> chi_Stack;
         bool ok = 1;
         T minvalue;
-
-        //set of params for the energy fit
-        struct minimumSetOfParams
-        {
-            double param1;
-            double param1_left = -5.0;
-            double param1_right = 5.0;
-            double param1_step = 0.13;
-        };
         minimumSetOfParams min_set;
+        EnergyFormula::ParameterSet params;
 
-        for (double param1 = min_set.param1_left; param1 <= min_set.param1_right && ok; param1 += min_set.param1_step)
+        for (double A1 = params.A_left; A1 <= params.A_right && ok; A1 += params.A_step)
         {
-            auto currentChi = chi.apply<T>(nucleus, param1);
-            if (isnan(currentChi))
+            for (double A2 = params.A_left; A2 <= params.A_right && ok; A2 += params.A_step)
             {
-                break;
-                ok = 0;
+                for (double A3 = params.A_left; A3 <= params.A_right && ok; A3 += params.A_step)
+                {
+                    {
+                        for (double theta = params.theta_left; theta <= params.theta_right && ok; theta += params.theta_step)
+                        {
+                            auto currentChi = chi.applyEnergies<T>(nucleus, A1, A2, A3, theta);
+                            if (isnan(currentChi))
+                            {
+                                break;
+                                ok = 0;
+                            }
+                            else
+                            {
+                                chi_Stack.emplace_back(currentChi);
+                            }
+                        }
+                    }
+                }
             }
-            else
-            {
-                chi_Stack.emplace_back(currentChi);
-            }
-        } /* 
-        for (auto &&i : chi_Stack)
-        {
-            std::cout << i << " ";
-        } */
-        // std::cout << std::endl;
+        }
+
+        // }
+        // for (auto &&i : chi_Stack)
+        // {
+        //     std::cout << i << " ";
+        // }
+        std::cout << chi_Stack.size();
+        std::cout << std::endl;
         auto index = std::distance(chi_Stack.begin(), std::min_element(chi_Stack.begin(), chi_Stack.end()));
         minvalue = chi_Stack.at(static_cast<int>(index));
         auto end = std::chrono::system_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-        std::cout << "minvalue evaluation took " << static_cast<double>(duration / 1000) << " seconds...";
+        std::cout << "minvalue evaluation took " << static_cast<double>(duration / 1000.0) << " seconds...";
         std::cout << "\n";
         std::cout << "index of the minimum in the stack is " << index << "\n";
-        std::cout << "the value of param1 is " << static_cast<double>(min_set.param1_left + (index * min_set.param1_step)) << "\n ";
+        std::cout << "the value of A1 is " << static_cast<double>(params.A_left + (index * params.A_step)) << "\n ";
         return minvalue;
     }
 };
-
 #endif // ENERGYEXPRESSIONS_HH

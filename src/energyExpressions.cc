@@ -1,15 +1,68 @@
 #include "../include/energyExpressions.hh"
-
+#include "../include/data.hh"
 #include <cmath>
 
-double EnergyFormula::yrastBand(double spin, double params)
+double EnergyFormula::yrastBand(double spin, double a1, double a2, double a3, double theta)
 {
-    return params * spin * spin + spin;
+    auto retval = energyExpression(0, spin, a1, a2, a3, theta);
+    if (retval)
+        return retval;
+    return 0;
 }
 
-double EnergyFormula::wobblingBand(double spin, double params)
+double EnergyFormula::wobblingBand(double spin, double a1, double a2, double a3, double theta)
 {
-    return params * spin * spin + spin;
+    auto retval = energyExpression(1, spin, a1, a2, a3, theta);
+    if (retval)
+        return retval;
+    return 0;
+}
+
+double EnergyFormula::j_Component(int n, double theta)
+{
+    if (n == 1)
+        return Constants::oddSpin * cos(theta * Constants::PI / 180.0);
+    return Constants::oddSpin * sin(theta * Constants::PI / 180.0);
+}
+
+double EnergyFormula::energyExpression(int N, double spin, double a1, double a2, double a3, double theta)
+{
+    auto j = Constants::oddSpin;
+    // auto j1 = j * cos(theta * Constants::PI / 180.0);
+    // auto j2 = j * sin(theta * Constants::PI / 180.0);
+
+    //j component functions
+    auto j1 = j_Component(1, theta);
+    auto j2 = j_Component(2, theta);
+
+    auto term1 = a1 * spin * spin + (2.0 * spin + 1.0) * a1 * j1 - spin * a2 * j2;
+    auto term2 = omega(spin, a1, a2, a3, theta) * (N + 0.5);
+    auto sum = a1 * j1 * j1 + a2 * j2 * j2;
+    auto retval = static_cast<double>(term1 + term2 + sum);
+    if (!isnan(retval))
+        return retval;
+    return 0;
+}
+
+double EnergyFormula::omega(double spin, double a1, double a2, double a3, double theta)
+{
+    auto j = Constants::oddSpin;
+
+    // auto j1 = j * sin(theta * Constants::PI / 180.0);
+    // auto j2 = j * cos(theta * Constants::PI / 180.0);
+
+    auto j1 = j_Component(1, theta);
+    auto j2 = j_Component(2, theta);
+
+    auto term1 = (2.0 * spin + 1.0) * (a2 - a1 - static_cast<double>((a2 * j2) / spin)) - 2.0 * a1 * j1;
+    auto term2 = (2.0 * spin + 1.0) * (a3 - a1) - 2.0 * a1 * j1;
+    auto term3 = (a3 - a1) * (a2 - a1 - static_cast<double>((a2 * j2) / spin));
+    // std::cout << "\n";
+    // std::cout << "in omega... " << term1 << " " << term2 << " " << term3 << "\n";
+    auto retval = static_cast<double>(sqrt(term1 * term2 - term3));
+    if (!isnan(retval))
+        return retval;
+    return 0;
 }
 
 // template <typename T>
