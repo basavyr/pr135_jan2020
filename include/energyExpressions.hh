@@ -53,6 +53,21 @@ public:
         }
     }
 
+    void normalizeBands(Pr135Experimental &obj)
+    {
+        auto size = obj.band1.size();
+        auto e0 = obj.band1.at(0).energy;
+        for (int i = 0; i < size; ++i)
+        {
+            obj.band1.at(i).energy = obj.band1.at(i).energy - e0;
+        }
+        size = obj.band2.size();
+        for (int i = 0; i < size; ++i)
+        {
+            obj.band2.at(i).energy = obj.band2.at(i).energy - e0;
+        }
+    }
+
     template <typename T>
     void kevTOmev(std::vector<T> &vec)
     {

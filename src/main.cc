@@ -52,14 +52,15 @@ void _init(Pr135Experimental &nucleus, EnergyFormula &formulas)
     nucleus.init_ENSDF(nucleus);
 
     //band1
-    formulas.normalize(nucleus.band1);
+    formulas.normalizeBands(nucleus);
+    // formulas.normalize(nucleus.band1);
     formulas.kevTOmevBand<double>(nucleus.band1);
 
     //band2
-    formulas.normalize(nucleus.band2);
+    // formulas.normalize(nucleus.band2);
     formulas.kevTOmevBand<double>(nucleus.band2);
     nucleus.cleanYrastBand(nucleus);
-    nucleus.cleanWobblingBand(nucleus);
+    // nucleus.cleanWobblingBand(nucleus);
 
     //print the energies
     // nucleus.printer(nucleus.band1);
