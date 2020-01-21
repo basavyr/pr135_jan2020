@@ -136,8 +136,15 @@ public:
         {
             dataExp.emplace_back(static_cast<T>(nucleus.band1.at(i).energy));
             auto theoreticalEnergy = yrast(nucleus.band1.at(i).spin);
-            if (theoreticalEnergy != 6969)
+            if (theoreticalEnergy == 6969)
+            {
+                // std::cout << "energy (yrast) value not valid!..." << nucleus.band1.at(i).spin << " " << a1 << " " << a2 << " " << a3 << " " << theta << " } \n";
+                // break;
+            }
+            else // (theoreticalEnergy != 6969)
+            {
                 dataTh.emplace_back(static_cast<T>(theoreticalEnergy));
+            }
         }
 
         //add the exp data and th data for the second
@@ -145,8 +152,15 @@ public:
         {
             dataExp.emplace_back(static_cast<T>(nucleus.band2.at(i).energy));
             auto theoreticalEnergy = wobbling(nucleus.band2.at(i).spin);
-            if (theoreticalEnergy != 6969)
+            if (theoreticalEnergy == 6969)
+            {
+                // std::cout << "energy (wobbling) value not valid!..." << nucleus.band2.at(i).spin << " " << a1 << " " << a2 << " " << a3 << " " << theta << " } \n";
+                // break;
+            }
+            else //(theoreticalEnergy != 6969)
+            {
                 dataTh.emplace_back(static_cast<T>(theoreticalEnergy));
+            }
         }
 
         auto chiVal = meanSquaredError(dataExp, dataTh);

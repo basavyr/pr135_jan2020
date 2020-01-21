@@ -104,10 +104,13 @@ void testForComplexValue_yrast()
                             //check the complex wobbling frequency
                             if (omega == 6969)
                             {
-                                // std::cout << "It failed for..." << energy << " and params { " << i1 << " " << i2 << " " << i3 << " " << theta << "\n";
+                                // std::cout << "It failed for...E= " << energy << " with spin I= " << 5.5 + 2 * k << " and params { " << i1 << " " << i2 << " " << i3 << " " << theta << "\n";
+                                // i1 = params.A_right + params.A_step;
                                 // i2 = params.A_right + params.A_step;
                                 // i3 = params.A_right + params.A_step;
+                                // theta = params.theta_right + params.theta_step;
                                 noFails++;
+                                // break;
                             }
                             noIterations++;
                         }
@@ -132,7 +135,7 @@ void testForComplexValue_yrast()
               << "\n";
     std::cout << "TOTAL N.O. ITERATIONS... " << noIterations << "\n";
     std::cout << "TOTAL N.O. FAILS... " << noFails << "\n";
-    std::cout << "Fail rate = " << static_cast<int>((static_cast<double>(noFails) / static_cast<double>(noIterations)) * 100) << "%\n";
+    std::cout << "Fail rate = " << static_cast<double>((static_cast<double>(noFails) / static_cast<double>(noIterations)) * 100) << "%\n";
 }
 void testForComplexValue_wobbling()
 {
@@ -171,10 +174,13 @@ void testForComplexValue_wobbling()
                             //check the complex wobbling frequency
                             if (omega == 6969)
                             {
-                                // std::cout << "It failed for..." << energy << " and params { " << i1 << " " << i2 << " " << i3 << " " << theta << "\n";
+                                // std::cout << "It failed for..." << energy<< " with spin I= " << 8.5 + 2 * k << " "<< " and params { " << i1 << " " << i2 << " " << i3 << " " << theta << "\n";
+                                // i1 = params.A_right + params.A_step;
                                 // i2 = params.A_right + params.A_step;
                                 // i3 = params.A_right + params.A_step;
+                                // theta = params.theta_right + params.theta_step;
                                 noFails++;
+                                // break;
                             }
                             noIterations++;
                         }
@@ -199,7 +205,7 @@ void testForComplexValue_wobbling()
               << "\n";
     std::cout << "TOTAL N.O. ITERATIONS... " << noIterations << "\n";
     std::cout << "TOTAL N.O. FAILS... " << noFails << "\n";
-    std::cout << "Fail rate = " << static_cast<int>((static_cast<double>(noFails) / static_cast<double>(noIterations)) * 100) << "%\n";
+    std::cout << "Fail rate = " << static_cast<double>((static_cast<double>(noFails) / static_cast<double>(noIterations)) * 100) << "%\n";
 }
 
 int main()
@@ -211,7 +217,7 @@ int main()
     MinimumValueParameter *paramSet = new MinimumValueParameter;
 
     _init(*nucleus, *formulas);
-    // std::cout << paramSet->calculateMinimumValue<double>(*nucleus, *formulas, *chisquared);
+    std::cout << paramSet->calculateMinimumValue<double>(*nucleus, *formulas, *chisquared);
 
     for (auto &&n : nucleus->band1)
     {
@@ -238,9 +244,28 @@ int main()
         // std::cout << A1 << " " << A2 << " " << A3 << " " << formulas->omega(n.spin, I1, I2, I3, theta) << " " << formulas->wobblingBand(n.spin, I1, I2, I3, theta)<< "\n";
     }
 
-    testForComplexValue_yrast();
-    testForComplexValue_wobbling();
+    // testForComplexValue_yrast();
+    // testForComplexValue_wobbling();
 
+    // std::cout << chisquared->applyEnergies<double>(*nucleus, 1, 1, 1, 60) << "\n";
+    // // std::cout << formulas->yrastBand(5.5, 116, 1, 1, 85) << "\n";
+    // // std::cout << formulas->yrastBand(7.5, 116, 1, 1, 86) << "\n";
+    // std::cout << "**********\n";
+    // // std::cout << formulas->wobblingBand(8.5, 101, 1, 66, 0) << "\n";
+    // // std::cout << formulas->wobblingBand(10.5, 101, 1, 66, 1) << "\n";
+    // std::cout << chisquared->applyEnergies<double>(*nucleus, 6, 91, 1, 70) << "\n";
+
+    /* for (int i = 0; i < nucleus->band1.size(); ++i)
+    {
+        auto spin = nucleus->band1.at(i).spin;
+        std::cout << spin << " " << EnergyFormula::yrastBand(spin, 116, 1, 1, 85) << "\n";
+    }
+    for (int i = 0; i < nucleus->band2.size(); ++i)
+    {
+        auto spin = nucleus->band2.at(i).spin;
+        std::cout << spin << " " << EnergyFormula::wobblingBand(spin, 116, 1, 76, 0) << "\n";
+    }
+ */
     delete nucleus;
     delete chisquared;
     delete formulas;

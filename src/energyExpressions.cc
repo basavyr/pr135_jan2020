@@ -28,7 +28,7 @@ double EnergyFormula::j_Component(int n, double theta)
 double EnergyFormula::energyExpression(int N, double spin, double a1, double a2, double a3, double theta)
 {
 
-    //stop calculus if the moments of inerta are NULL
+    //stop calculus if the moments of inertia are NULL
     if (!a1 || !a2 || !a3)
         return 6969;
     if (omega(spin, a1, a2, a3, theta) == 6969)
@@ -59,7 +59,7 @@ double EnergyFormula::energyExpression(int N, double spin, double a1, double a2,
     auto retval = static_cast<double>(term1 + term2 + sum);
     if (!isnan(retval))
         return retval;
-    return 0;
+    return 6969;
 }
 
 double EnergyFormula::inertiaFactor(double a)
