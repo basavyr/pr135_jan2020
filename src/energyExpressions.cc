@@ -5,16 +5,18 @@
 double EnergyFormula::yrastBand(double spin, double a1, double a2, double a3, double theta)
 {
     auto retval = energyExpression(0, spin, a1, a2, a3, theta);
+    auto e0 = energyExpression(0, 5.5, a1, a2, a3, theta);
     if (retval)
-        return retval;
+        return retval - e0;
     return 0;
 }
 
 double EnergyFormula::wobblingBand(double spin, double a1, double a2, double a3, double theta)
 {
     auto retval = energyExpression(1, spin, a1, a2, a3, theta);
+    auto e0 = energyExpression(0, 5.5, a1, a2, a3, theta);
     if (retval)
-        return retval;
+        return retval - e0;
     return 0;
 }
 
