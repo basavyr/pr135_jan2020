@@ -67,10 +67,15 @@ void _init(Pr135Experimental &nucleus, EnergyFormula &formulas)
     // nucleus.mathPrinter(nucleus.band2);
 }
 
-void testForComplexValue()
+void testForComplexValue_yrast()
 {
+    std::cout << "*********"
+              << "\n";
+    std::cout << "YRAST..."
+              << "\n";
     EnergyFormula::ParameterSet params;
     int noIterations = 0;
+    int noFails = 0;
     for (double i1 = params.A_left; i1 <= params.A_right; i1 += params.A_step)
     {
         auto a1 = EnergyFormula::inertiaFactor(i1);
@@ -83,15 +88,31 @@ void testForComplexValue()
                 for (double theta = params.theta_left; theta <= params.theta_right; theta += params.theta_step)
                 {
 
-                    if (!a1 || !a2 || !a3)
+                    //this condition is avoided with the new updated starting param for A
+                    /*  if (!a1 || !a2 || !a3)
                     {
                         std::cout << "CAN'T COMPUTE INERTIA FACTOR for I_k= " << i1 << " " << i2 << " " << i3 << " ..MOI IS ZERO"
                                   << "\n ";
                         break;
-                    }
-                    else
+                    } */
                     {
                         /* code */
+                        for (int k = 0; k < 11; ++k)
+                        {
+                            auto energy = EnergyFormula::yrastBand(5.5 + 2 * k, i1, i2, i3, theta);
+                            auto omega = EnergyFormula::omega(5.5 + 2 * k, i1, i2, i3, theta);
+                            //check the complex wobbling frequency
+                            if (omega == 6969)
+                            {
+                                // std::cout << "It failed for..." << energy << " and params { " << i1 << " " << i2 << " " << i3 << " " << theta << "\n";
+                                // i2 = params.A_right + params.A_step;
+                                // i3 = params.A_right + params.A_step;
+                                noFails++;
+                            }
+                            noIterations++;
+                        }
+                        // std::cout << omega << " " << energy << "\n";
+                        /* 
                         auto omega = EnergyFormula::omega(5.5, a1, a2, a3, theta);
                         if (omega == 6969)
                         {
@@ -100,9 +121,8 @@ void testForComplexValue()
                             if (noIterations == 215793)
                                 std::cout << typeid(omega).name() << "\n";
                             break;
-                        }
+                        } */
                         // std::cout << i1 << " " << i2 << " " << i3 << " " << a1 << " " << a2 << " " << a3 << omega << "\n";
-                        noIterations++;
                     }
                 }
             }
@@ -111,6 +131,75 @@ void testForComplexValue()
     std::cout << "TEST PASSED..."
               << "\n";
     std::cout << "TOTAL N.O. ITERATIONS... " << noIterations << "\n";
+    std::cout << "TOTAL N.O. FAILS... " << noFails << "\n";
+    std::cout << "Fail rate = " << static_cast<int>((static_cast<double>(noFails) / static_cast<double>(noIterations)) * 100) << "%\n";
+}
+void testForComplexValue_wobbling()
+{
+    std::cout << "*********"
+              << "\n";
+    std::cout << "WOBBLING..."
+              << "\n";
+    EnergyFormula::ParameterSet params;
+    int noIterations = 0;
+    int noFails = 0;
+    for (double i1 = params.A_left; i1 <= params.A_right; i1 += params.A_step)
+    {
+        auto a1 = EnergyFormula::inertiaFactor(i1);
+        for (double i2 = params.A_left; i2 <= params.A_right; i2 += params.A_step)
+        {
+            auto a2 = EnergyFormula::inertiaFactor(i2);
+            for (double i3 = params.A_left; i3 <= params.A_right; i3 += params.A_step)
+            {
+                auto a3 = EnergyFormula::inertiaFactor(i3);
+                for (double theta = params.theta_left; theta <= params.theta_right; theta += params.theta_step)
+                {
+
+                    //this condition is avoided with the new updated starting param for A
+                    /*  if (!a1 || !a2 || !a3)
+                    {
+                        std::cout << "CAN'T COMPUTE INERTIA FACTOR for I_k= " << i1 << " " << i2 << " " << i3 << " ..MOI IS ZERO"
+                                  << "\n ";
+                        break;
+                    } */
+                    {
+                        /* code */
+                        for (int k = 0; k < 5; ++k)
+                        {
+                            auto omega = EnergyFormula::omega(8.5 + 2 * k, i1, i2, i3, theta);
+                            auto energy = EnergyFormula::wobblingBand(8.5 + 2 * k, i1, i2, i3, theta);
+                            //check the complex wobbling frequency
+                            if (omega == 6969)
+                            {
+                                // std::cout << "It failed for..." << energy << " and params { " << i1 << " " << i2 << " " << i3 << " " << theta << "\n";
+                                // i2 = params.A_right + params.A_step;
+                                // i3 = params.A_right + params.A_step;
+                                noFails++;
+                            }
+                            noIterations++;
+                        }
+                        // std::cout << omega << " " << energy << "\n";
+                        /* 
+                        auto omega = EnergyFormula::omega(5.5, a1, a2, a3, theta);
+                        if (omega == 6969)
+                        {
+                            std::cout << "FOUND COMPLEX FREQUENCY..." << i1 << " " << i2 << " " << i3 << " " << omega
+                                      << "\n";
+                            if (noIterations == 215793)
+                                std::cout << typeid(omega).name() << "\n";
+                            break;
+                        } */
+                        // std::cout << i1 << " " << i2 << " " << i3 << " " << a1 << " " << a2 << " " << a3 << omega << "\n";
+                    }
+                }
+            }
+        }
+    }
+    std::cout << "TEST PASSED..."
+              << "\n";
+    std::cout << "TOTAL N.O. ITERATIONS... " << noIterations << "\n";
+    std::cout << "TOTAL N.O. FAILS... " << noFails << "\n";
+    std::cout << "Fail rate = " << static_cast<int>((static_cast<double>(noFails) / static_cast<double>(noIterations)) * 100) << "%\n";
 }
 
 int main()
@@ -149,7 +238,8 @@ int main()
         // std::cout << A1 << " " << A2 << " " << A3 << " " << formulas->omega(n.spin, I1, I2, I3, theta) << " " << formulas->wobblingBand(n.spin, I1, I2, I3, theta)<< "\n";
     }
 
-    testForComplexValue();
+    testForComplexValue_yrast();
+    testForComplexValue_wobbling();
 
     delete nucleus;
     delete chisquared;

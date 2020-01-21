@@ -118,6 +118,7 @@ public:
 
     //generate the two containers for computing the RMS.
     //experimental and theoretical containers with the excitation energies
+    //returns the RMS value provided by the rms function given the two energy containers
     template <typename T>
     T applyEnergies(Pr135Experimental &nucleus, double a1, double a2, double a3, double theta)
     {
