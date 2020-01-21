@@ -58,6 +58,8 @@ void _init(Pr135Experimental &nucleus, EnergyFormula &formulas)
     //band2
     formulas.normalize(nucleus.band2);
     formulas.kevTOmevBand<double>(nucleus.band2);
+    nucleus.cleanYrastBand(nucleus);
+    nucleus.cleanWobblingBand(nucleus);
 
     //print the energies
     // nucleus.printer(nucleus.band1);
@@ -217,7 +219,10 @@ int main()
     MinimumValueParameter *paramSet = new MinimumValueParameter;
 
     _init(*nucleus, *formulas);
-    std::cout << paramSet->calculateMinimumValue<double>(*nucleus, *formulas, *chisquared);
+    nucleus->printer(nucleus->band1);
+    std::cout << "\n";
+    nucleus->printer(nucleus->band2);
+    // std::cout << paramSet->calculateMinimumValue<double>(*nucleus, *formulas, *chisquared);
 
     for (auto &&n : nucleus->band1)
     {

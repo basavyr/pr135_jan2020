@@ -98,3 +98,23 @@ std::vector<Pr135Experimental::band> Pr135Experimental::data2Exp(Pr135Experiment
     }
     return retval;
 }
+
+void Pr135Experimental::cleanYrastBand(Pr135Experimental &obj)
+{
+    auto firstElement = obj.band1.at(0);
+    auto size = obj.band1.size();
+    // std::cout << "the first element of the yrast band is :" << firstElement.energy << " " << firstElement.spin << " " << size << "\n";
+    obj.band1.erase(obj.band1.begin(), obj.band1.begin() + 1);
+    firstElement = obj.band1.at(0);
+    size = obj.band1.size();
+    // std::cout << "the first element of the yrast band is :" << firstElement.energy << " " << firstElement.spin << " " << size << "\n";
+}
+
+void Pr135Experimental::cleanWobblingBand(Pr135Experimental &obj)
+{
+    auto firstElement = obj.band2.at(0);
+    auto size = obj.band2.size();
+    obj.band2.erase(obj.band2.begin(), obj.band2.begin() + 1);
+    firstElement = obj.band2.at(0);
+    size = obj.band2.size();
+}
