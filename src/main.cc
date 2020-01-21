@@ -67,6 +67,52 @@ void _init(Pr135Experimental &nucleus, EnergyFormula &formulas)
     // nucleus.mathPrinter(nucleus.band2);
 }
 
+void testForComplexValue()
+{
+    EnergyFormula::ParameterSet params;
+    int noIterations = 0;
+    for (double i1 = params.A_left; i1 <= params.A_right; i1 += params.A_step)
+    {
+        auto a1 = EnergyFormula::inertiaFactor(i1);
+        for (double i2 = params.A_left; i2 <= params.A_right; i2 += params.A_step)
+        {
+            auto a2 = EnergyFormula::inertiaFactor(i2);
+            for (double i3 = params.A_left; i3 <= params.A_right; i3 += params.A_step)
+            {
+                auto a3 = EnergyFormula::inertiaFactor(i3);
+                for (double theta = params.theta_left; theta <= params.theta_right; theta += params.theta_step)
+                {
+
+                    if (!a1 || !a2 || !a3)
+                    {
+                        std::cout << "CAN'T COMPUTE INERTIA FACTOR for I_k= " << i1 << " " << i2 << " " << i3 << " ..MOI IS ZERO"
+                                  << "\n ";
+                        break;
+                    }
+                    else
+                    {
+                        /* code */
+                        auto omega = EnergyFormula::omega(5.5, a1, a2, a3, theta);
+                        if (omega == 6969)
+                        {
+                            std::cout << "FOUND COMPLEX FREQUENCY..." << i1 << " " << i2 << " " << i3 << " " << omega
+                                      << "\n";
+                            if (noIterations == 215793)
+                                std::cout << typeid(omega).name() << "\n";
+                            break;
+                        }
+                        // std::cout << i1 << " " << i2 << " " << i3 << " " << a1 << " " << a2 << " " << a3 << omega << "\n";
+                        noIterations++;
+                    }
+                }
+            }
+        }
+    }
+    std::cout << "TEST PASSED..."
+              << "\n";
+    std::cout << "TOTAL N.O. ITERATIONS... " << noIterations << "\n";
+}
+
 int main()
 {
     //ENSDF DATA
@@ -87,8 +133,7 @@ int main()
         auto A2 = EnergyFormula::inertiaFactor(static_cast<double>(I2));
         auto A3 = EnergyFormula::inertiaFactor(static_cast<double>(I3));
         auto theta = 26.0;
-        std::cout << A1 << " " << A2 << " " << A3 << " " << formulas->omega(n.spin, I1, I2, I3, theta) << " " << formulas->yrastBand(n.spin, I1, I2, I3, theta);
-        std::cout << "\n";
+        // std::cout << A1 << " " << A2 << " " << A3 << " " << formulas->omega(n.spin, I1, I2, I3, theta) << " " << formulas->yrastBand(n.spin, I1, I2, I3, theta) << "\n";
     }
     std::cout << "\n";
 
@@ -101,9 +146,10 @@ int main()
         auto A2 = EnergyFormula::inertiaFactor(static_cast<double>(I2));
         auto A3 = EnergyFormula::inertiaFactor(static_cast<double>(I3));
         auto theta = 26.0;
-        std::cout << A1 << " " << A2 << " " << A3 << " " << formulas->omega(n.spin, I1, I2, I3, theta) << " " << formulas->wobblingBand(n.spin, I1, I2, I3, theta);
-        std::cout << "\n";
+        // std::cout << A1 << " " << A2 << " " << A3 << " " << formulas->omega(n.spin, I1, I2, I3, theta) << " " << formulas->wobblingBand(n.spin, I1, I2, I3, theta)<< "\n";
     }
+
+    testForComplexValue();
 
     delete nucleus;
     delete chisquared;

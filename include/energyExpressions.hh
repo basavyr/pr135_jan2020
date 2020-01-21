@@ -11,17 +11,22 @@ class EnergyFormula
 {
 public:
     //N=0 wobbling band
+    //a1,a2,a3 are the MOMENTS OF INERTIA (function depends on the inertia factor though!)
     static double yrastBand(double spin, double a1, double a2, double a3, double theta);
 
     //N=1 wobbling band
+    //a1,a2,a3 are the MOMENTS OF INERTIA (function depends on the inertia factor though!)
     static double wobblingBand(double spin, double a1, double a2, double a3, double theta);
 
+    //a1,a2,a3 are the MOMENTS OF INERTIA (function depends on the inertia factor though!)
     static double omega(double spin, double a1, double a2, double a3, double theta);
 
+    //a1,a2,a3 are the MOMENTS OF INERTIA (function depends on the inertia factor though!)
     static double energyExpression(int N, double spin, double a1, double a2, double a3, double theta);
 
     static double j_Component(int n, double theta);
 
+    //a1,a2,a3 are the MOMENTS OF INERTIA (function depends on the inertia factor though!)
     static double inertiaFactor(double a);
 
     //normalize to first state in yrast band
@@ -77,7 +82,7 @@ public:
     struct ParameterSet
     {
         // double A1, A2, A3;
-        const double A_left = 0.0;
+        const double A_left = 1.0;
         const double A_right = 120.0;
         const double A_step = 5;
         const double theta_left = 0.0;
@@ -94,7 +99,7 @@ public:
     T meanSquaredError(std::vector<T> &exp, std::vector<T> &th)
     {
         if (exp.size() != th.size())
-            return 0;
+            return 987654321;
         auto n = exp.size();
         T retval = static_cast<T>(0);
         for (int i = 0; i < exp.size(); ++i)
@@ -129,14 +134,18 @@ public:
         for (int i = 0; i < nucleus.band1.size(); ++i)
         {
             dataExp.emplace_back(static_cast<T>(nucleus.band1.at(i).energy));
-            dataTh.emplace_back(static_cast<T>(yrast(nucleus.band1.at(i).spin)));
+            auto theoreticalEnergy = yrast(nucleus.band1.at(i).spin);
+            if (theoreticalEnergy != 6969)
+                dataTh.emplace_back(static_cast<T>(theoreticalEnergy));
         }
 
         //add the exp data and th data for the second
         for (int i = 0; i < nucleus.band2.size(); ++i)
         {
             dataExp.emplace_back(static_cast<T>(nucleus.band2.at(i).energy));
-            dataTh.emplace_back(static_cast<T>(wobbling(nucleus.band2.at(i).spin)));
+            auto theoreticalEnergy = wobbling(nucleus.band2.at(i).spin);
+            if (theoreticalEnergy != 6969)
+                dataTh.emplace_back(static_cast<T>(theoreticalEnergy));
         }
 
         auto chiVal = meanSquaredError(dataExp, dataTh);
