@@ -44,6 +44,9 @@ public:
         return retval;
     }
 
+    //**************************
+    //WRONG NORMALIZE: must substract only E0_yrast
+    //**************************
     void normalize(std::vector<Pr135Experimental::band> &vec)
     {
         auto e0 = vec.at(0).energy;
