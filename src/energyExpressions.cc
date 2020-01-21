@@ -6,18 +6,20 @@ double EnergyFormula::yrastBand(double spin, double a1, double a2, double a3, do
 {
     auto retval = energyExpression(0, spin, a1, a2, a3, theta);
     auto e0 = energyExpression(0, 5.5, a1, a2, a3, theta);
-    if (retval)
+    if (retval && e0 != 6969)
         return retval - e0;
-    return 0;
+    //avoid showing energy which containes complex number (e0 can be complex!)
+    return 6969;
 }
 
 double EnergyFormula::wobblingBand(double spin, double a1, double a2, double a3, double theta)
 {
     auto retval = energyExpression(1, spin, a1, a2, a3, theta);
     auto e0 = energyExpression(0, 5.5, a1, a2, a3, theta);
-    if (retval)
+    if (retval && e0 != 6969)
         return retval - e0;
-    return 0;
+    //avoid showing energy which containes complex number (e0 can be complex!)
+    return 6969;
 }
 
 double EnergyFormula::j_Component(int n, double theta)
@@ -54,8 +56,11 @@ double EnergyFormula::energyExpression(int N, double spin, double a1, double a2,
 
     //checking for complex numers
     if (!term2)
+    {
         std::cout << "found complex number at..." << spin << " and params { " << a1 << " " << a2 << " " << a3 << " " << theta << " } "
                   << "\n";
+        return 6969;
+    }
 
     auto sum = A1 * j1 * j1 + A2 * j2 * j2;
     auto retval = static_cast<double>(term1 + term2 + sum);
