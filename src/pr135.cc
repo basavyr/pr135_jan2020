@@ -15,9 +15,11 @@ void Pr135Experimental::init_ENSDF(Pr135Experimental &obj)
     {
         obj.band1.emplace_back(band());
         //determine R component of the total spin I
-        auto spinCorrection = static_cast<double>(ExperimentalData_ENSDF::spin1[i] - Constants::oddSpin);
+        // auto spinCorrection = static_cast<double>(ExperimentalData_ENSDF::spin1[i] - Constants::oddSpin);
         //energy formulas work with the spin correction I=R+j
-        band1.at(i).spin = static_cast<double>(spinCorrection);
+        // band1.at(i).spin = static_cast<double>(spinCorrection);
+        //energy formulas with the standard I spin from the experimental data
+        band1.at(i).spin = static_cast<double>(ExperimentalData_ENSDF::spin1[i]);
         band1.at(i).energy = static_cast<double>(ExperimentalData_ENSDF::energy1[i]);
     }
 
@@ -27,9 +29,11 @@ void Pr135Experimental::init_ENSDF(Pr135Experimental &obj)
     {
         obj.band2.emplace_back(band());
         //determine R component of the total spin I
-        auto spinCorrection = static_cast<double>(ExperimentalData_ENSDF::spin2[i] - Constants::oddSpin);
+        // auto spinCorrection = static_cast<double>(ExperimentalData_ENSDF::spin2[i] - Constants::oddSpin);
         //energy formulas work with the spin correction I=R+j
-        band2.at(i).spin = static_cast<double>(spinCorrection);
+        // band2.at(i).spin = static_cast<double>(spinCorrection);
+        //energy formulas with the standard I spin from the experimental data
+        band2.at(i).spin = static_cast<double>(ExperimentalData_ENSDF::spin2[i]);
         band2.at(i).energy = static_cast<double>(ExperimentalData_ENSDF::energy2[i]);
     }
 }
@@ -84,6 +88,7 @@ void Pr135Experimental::mathPrinter(std::vector<Pr135Experimental::band> &array)
     }
     std::cout << "};\n";
 }
+
 
 std::vector<Pr135Experimental::band> Pr135Experimental::data1Exp(Pr135Experimental &obj)
 {

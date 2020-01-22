@@ -14,7 +14,8 @@ double EnergyFormula::yrastBand(double spin, double a1, double a2, double a3, do
 
 double EnergyFormula::wobblingBand(double spin, double a1, double a2, double a3, double theta)
 {
-    auto retval = energyExpression(1, spin, a1, a2, a3, theta);
+    //wobbling band has also n=0
+    auto retval = energyExpression(0, spin, a1, a2, a3, theta);
     auto e0 = energyExpression(0, 5.5, a1, a2, a3, theta);
     if (retval && e0 != 6969)
         return retval - e0;
@@ -35,6 +36,8 @@ double EnergyFormula::energyExpression(int N, double spin, double a1, double a2,
     //stop calculus if the moments of inertia are NULL
     if (!a1 || !a2 || !a3)
         return 6969;
+
+    //checking for complex numers
     if (omega(spin, a1, a2, a3, theta) == 6969)
         return 6969;
 
@@ -54,8 +57,9 @@ double EnergyFormula::energyExpression(int N, double spin, double a1, double a2,
     auto term1 = A1 * spin * spin + (2.0 * spin + 1.0) * A1 * j1 - spin * A2 * j2;
     auto term2 = omega(spin, a1, a2, a3, theta) * (N + 0.5);
 
-    //checking for complex numers
-    if (!term2)
+    auto case1 = 6969 * 0.5;
+    auto case2 = 6969 * 1.5;
+    if (term2 == case1 || term2 == case2)
     {
         std::cout << "found complex number at..." << spin << " and params { " << a1 << " " << a2 << " " << a3 << " " << theta << " } "
                   << "\n";
@@ -103,6 +107,142 @@ double EnergyFormula::omega(double spin, double a1, double a2, double a3, double
     if (!isnan(retval))
         return retval;
     return 6969;
+}
+
+void EnergyFormula::parametricPrinter(Pr135Experimental &nucleus, double i1, double i2, double i3, double theta)
+{
+    std::vector<double> theoreticalEnergies;
+    auto size = nucleus.band1.size();
+    for (int i = 0; i < size; ++i)
+    {
+        auto spin = nucleus.band1.at(i).spin;
+        theoreticalEnergies.emplace_back(EnergyFormula::yrastBand(spin, i1, i2, i3, theta));
+    }
+    size = nucleus.band2.size();
+    for (int i = 0; i < size; ++i)
+    {
+        auto spin = nucleus.band2.at(i).spin;
+        theoreticalEnergies.emplace_back(EnergyFormula::wobblingBand(spin, i1, i2, i3, theta));
+    }
+    size = nucleus.band1.size();
+    auto index = 0;
+
+    //classic printing
+    /* for (int i = 0; i < size; ++i)
+    {
+        std::cout << nucleus.band1.at(i).spin << " " << nucleus.band1.at(i).energy << " " << theoreticalEnergies.at(index);
+        std::cout << "\n";
+        index++;
+    }
+    size = nucleus.band2.size();
+    for (int i = 0; i < size; ++i)
+    {
+        std::cout << nucleus.band2.at(i).spin << " " << nucleus.band2.at(i).energy << " " << theoreticalEnergies.at(index);
+        std::cout << "\n";
+        index++;
+    } */
+    mathmematicaPrinter(nucleus, theoreticalEnergies);
+    std::cout << std::endl;
+}
+
+void EnergyFormula::mathmematicaPrinter(Pr135Experimental &nucleus, std::vector<double> &vec)
+{
+    auto index = 0;
+    //spins
+    // mathematicaSpinPrinter(nucleus);
+    //energies
+    /*  std::cout << "exp1= { ";
+    for (int i = 0; i < nucleus.band1.size(); ++i)
+    {
+        if (i == nucleus.band1.size() - 1)
+        {
+            std::cout << nucleus.band1.at(i).energy;
+        }
+        else
+        {
+            std::cout << nucleus.band1.at(i).energy << " , ";
+        }
+    }
+    std::cout << " };"
+              << "\n"; */
+    std::cout << "th1= { ";
+    for (int i = 0; i < nucleus.band1.size(); ++i)
+    {
+        if (i == nucleus.band1.size() - 1)
+        {
+            std::cout << vec.at(index);
+            index++;
+        }
+        else
+        {
+            std::cout << vec.at(index) << " , ";
+            index++;
+        }
+    }
+    std::cout << " };"
+              << "\n";
+    /*  std::cout << "exp2= { ";
+    for (int i = 0; i < nucleus.band2.size(); ++i)
+    {
+        if (i == nucleus.band2.size() - 1)
+        {
+            std::cout << nucleus.band2.at(i).energy;
+        }
+        else
+        {
+            std::cout << nucleus.band2.at(i).energy << " , ";
+        }
+    }
+    std::cout << " };"
+              << "\n"; */
+    std::cout << "th2= { ";
+    for (int i = 0; i < nucleus.band2.size(); ++i)
+    {
+        if (i == nucleus.band2.size() - 1)
+        {
+            std::cout << vec.at(index);
+            index++;
+        }
+        else
+        {
+            std::cout << vec.at(index) << " , ";
+            index++;
+        }
+    }
+    std::cout << " };"
+              << "\n";
+}
+
+void EnergyFormula::mathematicaSpinPrinter(Pr135Experimental &nucleus)
+{
+    std::cout << "spin1= { ";
+    for (auto i = 0; i < nucleus.band1.size(); ++i)
+    {
+        if (i == nucleus.band1.size() - 1)
+        {
+            std::cout << nucleus.band1.at(i).spin;
+        }
+        else
+        {
+            std::cout << nucleus.band1.at(i).spin << " , ";
+        }
+    }
+    std::cout << " };"
+              << "\n";
+    std::cout << "spin2= { ";
+    for (auto i = 0; i < nucleus.band2.size(); ++i)
+    {
+        if (i == nucleus.band2.size() - 1)
+        {
+            std::cout << nucleus.band2.at(i).spin;
+        }
+        else
+        {
+            std::cout << nucleus.band2.at(i).spin << " , ";
+        }
+    }
+    std::cout << " };"
+              << "\n";
 }
 
 // template <typename T>

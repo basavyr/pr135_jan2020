@@ -220,10 +220,7 @@ int main()
     MinimumValueParameter *paramSet = new MinimumValueParameter;
 
     _init(*nucleus, *formulas);
-    nucleus->printer(nucleus->band1);
-    std::cout << "\n";
-    nucleus->printer(nucleus->band2);
-    // std::cout << paramSet->calculateMinimumValue<double>(*nucleus, *formulas, *chisquared);
+    std::cout << paramSet->calculateMinimumValue<double>(*nucleus, *formulas, *chisquared);
 
     for (auto &&n : nucleus->band1)
     {
@@ -251,7 +248,10 @@ int main()
     }
 
     // testForComplexValue_yrast();
+
     // testForComplexValue_wobbling();
+
+    // std::cout << EnergyFormula::omega(5.5, 27, 14, 9, 0) << "\n";
 
     // std::cout << chisquared->applyEnergies<double>(*nucleus, 1, 1, 1, 60) << "\n";
     // // std::cout << formulas->yrastBand(5.5, 116, 1, 1, 85) << "\n";

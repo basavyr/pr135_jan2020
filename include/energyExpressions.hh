@@ -29,6 +29,15 @@ public:
     //a1,a2,a3 are the MOMENTS OF INERTIA (function depends on the inertia factor though!)
     static double inertiaFactor(double a);
 
+    //print the energies (exp and th) as a function of the best fit parameters
+    static void parametricPrinter(Pr135Experimental &nucleus, double i1, double i2, double i3, double theta);
+
+    //print as mathematica format
+    static void mathmematicaPrinter(Pr135Experimental &nucleus, std::vector<double> &vec);
+
+    //print the spins as mathematica format
+    static void mathematicaSpinPrinter(Pr135Experimental &nucleus);
+
     //normalize to first state in yrast band
     template <typename T>
     std::vector<T> normalize(std::vector<Pr135Experimental::band> &vec)
@@ -102,10 +111,10 @@ public:
         // double A1, A2, A3;
         const double A_left = 1.0;
         const double A_right = 120.0;
-        const double A_step = 1;
-        const double theta_left = 0.0;
+        const double A_step = 5;
+        const double theta_left = 1.0;
         const double theta_right = 180.0;
-        const double theta_step = 1.0;
+        const double theta_step = 5.0;
         // double theta;
     };
 };
@@ -205,6 +214,9 @@ public:
         double A2_min;
         double A3_min;
         double theta_min;
+        double I1_min;
+        double I2_min;
+        double I3_min;
     };
 
     template <typename T>
@@ -216,6 +228,8 @@ public:
         T minvalue;
         minimumSetOfParams min_set;
         EnergyFormula::ParameterSet params;
+        std::vector<minimumSetOfParams> minSetOfParamsArray;
+        auto minArrayIndex = 0;
 
         for (double I1 = params.A_left; I1 <= params.A_right && ok; I1 += params.A_step)
         {
@@ -235,6 +249,12 @@ public:
                             else
                             {
                                 chi_Stack.emplace_back(currentChi);
+                                minSetOfParamsArray.emplace_back(minimumSetOfParams());
+                                minSetOfParamsArray.at(minArrayIndex).I1_min = I1;
+                                minSetOfParamsArray.at(minArrayIndex).I2_min = I2;
+                                minSetOfParamsArray.at(minArrayIndex).I3_min = I3;
+                                minSetOfParamsArray.at(minArrayIndex).theta_min = theta;
+                                minArrayIndex++;
                             }
                         }
                     }
@@ -247,8 +267,8 @@ public:
         // {
         //     std::cout << i << " ";
         // }
-        std::cout << chi_Stack.size();
-        std::cout << std::endl;
+        // std::cout << chi_Stack.size();
+        // std::cout << std::endl;
         auto index = std::distance(chi_Stack.begin(), std::min_element(chi_Stack.begin(), chi_Stack.end()));
         minvalue = chi_Stack.at(static_cast<int>(index));
         auto end = std::chrono::system_clock::now();
@@ -256,7 +276,11 @@ public:
         std::cout << "minvalue evaluation took " << static_cast<double>(duration / 1000.0) << " seconds...";
         std::cout << "\n";
         std::cout << "index of the minimum in the stack is " << index << "\n";
-        std::cout << "the value of A1 is " << static_cast<double>(params.A_left + (index * params.A_step)) << "\n ";
+        std::cout << "Minimumm set of parameters are: I1= " << minSetOfParamsArray.at(index).I1_min << " I2= " << minSetOfParamsArray.at(index).I2_min << " I3= " << minSetOfParamsArray.at(index).I3_min << " theta= " << minSetOfParamsArray.at(index).theta_min << "\n";
+        std::cout << "******** DATA ********"
+                  << "\n";
+        EnergyFormula::parametricPrinter(nucleus, minSetOfParamsArray.at(index).I1_min, minSetOfParamsArray.at(index).I2_min, minSetOfParamsArray.at(index).I3_min, minSetOfParamsArray.at(index).theta_min);
+
         return minvalue;
     }
 };
