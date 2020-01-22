@@ -36,10 +36,28 @@ public:
     std::vector<band> data1Exp(Pr135Experimental &);
     std::vector<band> data2Exp(Pr135Experimental &);
 
+    //remove the first element from the experimental data of the yrast band
+    void cleanYrastBand(Pr135Experimental &);
+    void cleanWobblingBand(Pr135Experimental &);
+
     //additional methods:
 public:
     static void printer(std::vector<band> &);
     static void newLine();
+
+    //printer function for mathematica output
+    static void mathPrinter(std::vector<band> &);
+};
+
+class Pr135Theoretical
+{
+public:
+    struct band
+    {
+        double spin, energy;
+    };
+    std::vector<band> band1;
+    std::vector<band> band2;
 };
 
 #endif // PR135_HH
