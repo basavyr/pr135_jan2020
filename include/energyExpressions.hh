@@ -111,10 +111,10 @@ public:
         // double A1, A2, A3;
         const double A_left = 1.0;
         const double A_right = 120.0;
-        const double A_step = 5;
+        const double A_step = 1;
         const double theta_left = 1.0;
         const double theta_right = 180.0;
-        const double theta_step = 5.0;
+        const double theta_step = 1.0;
         // double theta;
     };
 };

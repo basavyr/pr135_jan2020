@@ -70,6 +70,31 @@ void _init(Pr135Experimental &nucleus, EnergyFormula &formulas)
     // nucleus.mathPrinter(nucleus.band2);
 }
 
+//matta data initialization
+void _init_matta(Pr135Experimental &nucleus, EnergyFormula &formulas)
+{
+    //generate the two experimental bands from the input data
+    nucleus.init_MATTA(nucleus);
+
+    //band1
+    formulas.normalizeBands(nucleus);
+    // formulas.normalize(nucleus.band1);
+    formulas.kevTOmevBand<double>(nucleus.band1);
+
+    //band2
+    // formulas.normalize(nucleus.band2);
+    formulas.kevTOmevBand<double>(nucleus.band2);
+    nucleus.cleanYrastBand(nucleus);
+    // nucleus.cleanWobblingBand(nucleus);
+
+    //print the energies
+    nucleus.printer(nucleus.band1);
+    nucleus.printer(nucleus.band2);
+
+    // nucleus.mathPrinter(nucleus.band1);
+    // nucleus.mathPrinter(nucleus.band2);
+}
+
 void testForComplexValue_yrast()
 {
     std::cout << "*********"
@@ -219,8 +244,17 @@ int main()
     EnergyFormula *formulas = new EnergyFormula;
     MinimumValueParameter *paramSet = new MinimumValueParameter;
 
-    _init(*nucleus, *formulas);
-    std::cout << paramSet->calculateMinimumValue<double>(*nucleus, *formulas, *chisquared);
+    double paramsImported[5] = {129.144 , 9.91615 , 0.364585 , -1.98};
+
+    //initialize the containers with the experimental data from ENSDF
+    _init_matta(*nucleus, *formulas);
+    // std::cout << paramSet->calculateMinimumValue<double>(*nucleus, *formulas, *chisquared);
+
+    //initialize the containers with the experimental data from MATTA
+    // _init_matta(*nucleus, *formulas);
+    // std::cout << paramSet->calculateMinimumValue<double>(*nucleus, *formulas, *chisquared);
+    // std::cout << chisquared->applyEnergies<double>(*nucleus, EnergyFormula::inertiaFactor(paramsImported[0]), EnergyFormula::inertiaFactor(paramsImported[1]), EnergyFormula::inertiaFactor(paramsImported[2]), EnergyFormula::inertiaFactor(paramsImported[3]));
+    std::cout << chisquared->applyEnergies<double>(*nucleus, paramsImported[0], paramsImported[1], paramsImported[2], paramsImported[3]);
 
     for (auto &&n : nucleus->band1)
     {
