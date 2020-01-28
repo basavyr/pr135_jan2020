@@ -194,6 +194,36 @@ public:
         return static_cast<T>(chiVal);
     }
 
+    //generates a pair of containers with experimental and theoretical data for pr135
+    //uses only the pure energies (un-normalized)
+    //combines both bands into one dataset
+    //returns the RMS value provided by the rms function given the two energy containers
+    template <typename T>
+    T applyRawEnergies(Pr135Experimental &nucleus, double i1, double i2, double i3, double theta)
+    {
+        std::vector<T> dataExp;
+        std::vector<T> dataTh;
+        //populates the containers with anydata
+        auto filler = [](std::vector<T> v, auto y) {
+            v.emplace_back(static_cast<T>(y));
+        };
+
+        for (int i = 0; i < nucleus.band1.size(); ++i)
+        {
+            filler(dataExp, nucleus.band1.at(i).energy);
+            auto theoreticalEnergy = EnergyFormula::energyExpression(0, nucleus.band1.at(i).spin, i1, i2, i3, theta);
+            if (theoreticalEnergy != 6969)
+                filler(dataTh, theoreticalEnergy);
+        }
+        for (int i = 0; i < nucleus.band2.size(); ++i)
+        {
+            filler(dataExp, nucleus.band2.at(i).energy);
+            auto theoreticalEnergy=EnergyFormula::energyExpression(0,nucleus.band2.at(i).spin,i1,i2,i3,theta);
+            if (theoreticalEnergy != 6969)
+                filler(dataTh, theoreticalEnergy);
+        }
+    }
+
 public:
     template <typename T>
     bool isValid(T arg)
