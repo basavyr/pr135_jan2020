@@ -4,8 +4,10 @@
 #include <vector>
 #include <cmath>
 #include "../include/pr135.hh"
+#include "../include/data.hh"
 #include <iostream>
 #include <chrono>
+#include <utility>
 
 class EnergyFormula
 {
@@ -199,29 +201,63 @@ public:
     //combines both bands into one dataset
     //returns the RMS value provided by the rms function given the two energy containers
     template <typename T>
-    T applyRawEnergies(Pr135Experimental &nucleus, double i1, double i2, double i3, double theta)
+    T applyRawEnergies(double i1, double i2, double i3, double theta)
     {
         std::vector<T> dataExp;
         std::vector<T> dataTh;
         //populates the containers with anydata
-        auto filler = [](std::vector<T> v, auto y) {
-            v.emplace_back(static_cast<T>(y));
+        auto filler = [](std::vector<T> &v, auto y) {
+            v.emplace_back(std::move(y));
         };
 
-        for (int i = 0; i < nucleus.band1.size(); ++i)
+        for (int i = 0; i < Constants::dim1; ++i)
         {
-            filler(dataExp, nucleus.band1.at(i).energy);
-            auto theoreticalEnergy = EnergyFormula::energyExpression(0, nucleus.band1.at(i).spin, i1, i2, i3, theta);
+            filler(dataExp, static_cast<T>(ExperimentalData_ENSDF::energy1[i] / 1000.0));
+            auto theoreticalEnergy = EnergyFormula::energyExpression(0, ExperimentalData_ENSDF::spin1[i], i1, i2, i3, theta);
             if (theoreticalEnergy != 6969)
                 filler(dataTh, theoreticalEnergy);
         }
-        for (int i = 0; i < nucleus.band2.size(); ++i)
+        for (int i = 0; i < Constants::dim2; ++i)
         {
-            filler(dataExp, nucleus.band2.at(i).energy);
-            auto theoreticalEnergy=EnergyFormula::energyExpression(0,nucleus.band2.at(i).spin,i1,i2,i3,theta);
+            filler(dataExp, static_cast<T>(ExperimentalData_ENSDF::energy2[i] / 1000.0));
+            auto theoreticalEnergy = EnergyFormula::energyExpression(0, ExperimentalData_ENSDF::spin2[i], i1, i2, i3, theta);
             if (theoreticalEnergy != 6969)
                 filler(dataTh, theoreticalEnergy);
         }
+        auto rmsValue = meanSquaredError(dataExp, dataTh);
+        return static_cast<T>(rmsValue);
+    }
+
+    //generates a pair of containers with experimental and theoretical data for pr135
+    //uses only the pure energies (un-normalized)
+    //combines both bands into one dataset
+    //returns the RMS value provided by the rms function given the two energy containers
+    template <typename T>
+    T applyRawEnergies_matta(double i1, double i2, double i3, double theta)
+    {
+        std::vector<T> dataExp;
+        std::vector<T> dataTh;
+        //populates the containers with anydata
+        auto filler = [](std::vector<T> &v, auto y) {
+            v.emplace_back(std::move(y));
+        };
+
+        for (int i = 0; i < Constants::dim1; ++i)
+        {
+            filler(dataExp, static_cast<T>(ExperimentalData_MATTA::energy1[i] / 1000.0));
+            auto theoreticalEnergy = EnergyFormula::energyExpression(0, ExperimentalData_MATTA::spin1[i], i1, i2, i3, theta);
+            if (theoreticalEnergy != 6969)
+                filler(dataTh, theoreticalEnergy);
+        }
+        for (int i = 0; i < Constants::dim2; ++i)
+        {
+            filler(dataExp, static_cast<T>(ExperimentalData_MATTA::energy2[i] / 1000.0));
+            auto theoreticalEnergy = EnergyFormula::energyExpression(0, ExperimentalData_MATTA::spin2[i], i1, i2, i3, theta);
+            if (theoreticalEnergy != 6969)
+                filler(dataTh, theoreticalEnergy);
+        }
+        auto rmsValue = meanSquaredError(dataExp, dataTh);
+        return static_cast<T>(rmsValue);
     }
 
 public:
@@ -270,7 +306,14 @@ public:
                     {
                         for (double theta = params.theta_left; theta <= params.theta_right && ok; theta += params.theta_step)
                         {
-                            auto currentChi = chi.applyEnergies<T>(nucleus, I1, I2, I3, theta);
+                            //perfornm the minimum chi2 calculus using the normalized energies
+                            // auto currentChi = chi.applyEnergies<T>(nucleus, I1, I2, I3, theta);
+
+                            //perform the minimum chi2 calculus using the raw (un-normalized) energies provided by ENSF
+                            // auto currentChi = chi.applyRawEnergies<T>(I1, I2, I3, theta);
+
+                            //perform the minimum chi2 calculus using the raw (un-normalized) energies provided by Matta et al
+                            auto currentChi = chi.applyRawEnergies_matta<T>(I1, I2, I3, theta);
                             if (isnan(currentChi))
                             {
                                 break;

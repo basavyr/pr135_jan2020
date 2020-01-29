@@ -63,8 +63,8 @@ void _init(Pr135Experimental &nucleus, EnergyFormula &formulas)
     // nucleus.cleanWobblingBand(nucleus);
 
     //print the energies
-    // nucleus.printer(nucleus.band1);
-    // nucleus.printer(nucleus.band2);
+    nucleus.printer(nucleus.band1);
+    nucleus.printer(nucleus.band2);
 
     // nucleus.mathPrinter(nucleus.band1);
     // nucleus.mathPrinter(nucleus.band2);
@@ -244,17 +244,17 @@ int main()
     EnergyFormula *formulas = new EnergyFormula;
     MinimumValueParameter *paramSet = new MinimumValueParameter;
 
-    double paramsImported[5] = {129.144 , 9.91615 , 0.364585 , -1.98};
+    double paramsImported[5] = {53.2596, 4.03174,  22.0737 , 3.52067};
 
     //initialize the containers with the experimental data from ENSDF
-    _init_matta(*nucleus, *formulas);
+    _init(*nucleus, *formulas);
     // std::cout << paramSet->calculateMinimumValue<double>(*nucleus, *formulas, *chisquared);
 
     //initialize the containers with the experimental data from MATTA
     // _init_matta(*nucleus, *formulas);
-    // std::cout << paramSet->calculateMinimumValue<double>(*nucleus, *formulas, *chisquared);
+    std::cout << paramSet->calculateMinimumValue<double>(*nucleus, *formulas, *chisquared);
     // std::cout << chisquared->applyEnergies<double>(*nucleus, EnergyFormula::inertiaFactor(paramsImported[0]), EnergyFormula::inertiaFactor(paramsImported[1]), EnergyFormula::inertiaFactor(paramsImported[2]), EnergyFormula::inertiaFactor(paramsImported[3]));
-    std::cout << chisquared->applyEnergies<double>(*nucleus, paramsImported[0], paramsImported[1], paramsImported[2], paramsImported[3]);
+    // std::cout << chisquared->applyRawEnergies<double>(paramsImported[0], paramsImported[1], paramsImported[2], paramsImported[3]);
 
     for (auto &&n : nucleus->band1)
     {
