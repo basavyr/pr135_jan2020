@@ -145,6 +145,71 @@ void EnergyFormula::parametricPrinter(Pr135Experimental &nucleus, double i1, dou
     std::cout << std::endl;
 }
 
+double EnergyFormula::energy_ZeroTheta(int n, double spin, double a1, double a2, double a3, double theta)
+{
+    theta = static_cast<double>(0);
+
+    // ######################################
+    //don't have to transform the moments of inertia since the energy function takes care of that by default
+
+    //taking care of the moments of inertia
+    //convert the moments of inertia in inertia factors by the conformal transformation
+    // a1 = inertiaFactor(a1);
+    // a2 = inertiaFactor(a2);
+    // a3 = inertiaFactor(a3);
+
+    //#########################################
+    // don't have to generate the compoents of the ingle particle angular momentun since the energy function takes care of that by default
+
+    //generate the components of the single particle angular momentun
+    // auto j1 = j_Component(1, theta);
+    // auto j2 = j_Component(2, theta);
+
+    auto result = energyExpression(n, spin, a1, a2, a3, theta);
+    return static_cast<double>(result);
+}
+
+double EnergyFormula::energy_minHamiltonian(double spin, double a1, double a2, double a3, double theta)
+{
+
+    //taking care of the moments of inertia
+    //convert the moments of inertia in inertia factors by the conformal transformation
+    a1 = inertiaFactor(a1);
+    a2 = inertiaFactor(a2);
+    a3 = inertiaFactor(a3);
+
+    //generate the components of the single particle angular momentun
+    auto j1 = j_Component(1, theta);
+    auto j2 = j_Component(2, theta);
+
+    auto minimalTerm = a1 * spin * spin + (2.0 * spin + 1.0) * a1 * j1 - a2 * j2 * spin;
+    auto result = minimalTerm;
+    return static_cast<double>(result);
+}
+
+double EnergyFormula::energy_justOmega(int n, double spin, double a1, double a2, double a3, double theta)
+{
+    auto result = 1;
+    return static_cast<double>(result);
+}
+
+EnergyFormula::triplet EnergyFormula::singleParticleSum(double theta, double a1, double a2, double a3)
+{
+    // auto x = new triplet;
+    triplet result;
+    a1 = inertiaFactor(a1);
+    a2 = inertiaFactor(a2);
+    a3 = inertiaFactor(a3);
+
+    auto j1 = j_Component(1, theta);
+    auto j2 = j_Component(2, theta);
+
+    result.firstSumComponent = (a1 * j1 * j1);
+    result.secondSumComponent = (a2 * j2 * j2);
+    result.totalsum = result.totalSum();
+    return result;
+}
+
 void EnergyFormula::mathmematicaPrinter(Pr135Experimental &nucleus, std::vector<double> &vec)
 {
     auto index = 0;

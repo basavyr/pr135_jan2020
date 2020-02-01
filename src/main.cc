@@ -244,7 +244,7 @@ int main()
     EnergyFormula *formulas = new EnergyFormula;
     MinimumValueParameter *paramSet = new MinimumValueParameter;
 
-    double paramsImported[5] = {53.2596, 4.03174,  22.0737 , 3.52067};
+    double paramsImported[5] = {52.0588, 19.9804, 6.4409, 15.977};
 
     //initialize the containers with the experimental data from ENSDF
     _init(*nucleus, *formulas);

@@ -12,6 +12,18 @@
 class EnergyFormula
 {
 public:
+    struct triplet
+    {
+        double firstSumComponent;
+        double secondSumComponent;
+        double totalsum;
+        double totalSum()
+        {
+            return firstSumComponent + secondSumComponent;
+        }
+    };
+
+public:
     //N=0 wobbling band
     //a1,a2,a3 are the MOMENTS OF INERTIA (function depends on the inertia factor though!)
     static double yrastBand(double spin, double a1, double a2, double a3, double theta);
@@ -39,6 +51,23 @@ public:
 
     //print the spins as mathematica format
     static void mathematicaSpinPrinter(Pr135Experimental &nucleus);
+
+    //the minimum hamiltonian. ingore the wobbling escitations and the particle alignment
+    //a1,a2,a3 are the MOMENTS OF INERTIA (function depends on the inertia factor though!)
+    static double energy_minHamiltonian(double spin, double a1, double a2, double a3, double theta);
+
+    //energy expression for theta equal to zero => no single particle alignment
+    //a1,a2,a3 are the MOMENTS OF INERTIA (function depends on the inertia factor though!)
+    static double energy_ZeroTheta(int n, double spin, double a1, double a2, double a3, double theta);
+
+    //energy expression for theta equal to zero => no single particle alignment
+    //a1,a2,a3 are the MOMENTS OF INERTIA (function depends on the inertia factor though!)
+    static double energy_justOmega(int n, double spin, double a1, double a2, double a3, double theta);
+
+    //checks the single particle sum from the total Hamiltonian
+    static triplet singleParticleSum(double a1, double a2, double a3, double theta);
+
+    //energy expression for
 
     //normalize to first state in yrast band
     template <typename T>
@@ -313,7 +342,7 @@ public:
                             // auto currentChi = chi.applyRawEnergies<T>(I1, I2, I3, theta);
 
                             //perform the minimum chi2 calculus using the raw (un-normalized) energies provided by Matta et al
-                            auto currentChi = chi.applyRawEnergies_matta<T>(I1, I2, I3, theta);
+                            auto currentChi = chi.applyRawEnergies<T>(I1, I2, I3, theta);
                             if (isnan(currentChi))
                             {
                                 break;
