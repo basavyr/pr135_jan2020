@@ -2,10 +2,12 @@
 #include <vector>
 #include <string>
 #include <ctime>
+#include <utility>
 
 #include "../include/pr135.hh"
 #include "../include/data.hh"
 #include "../include/energyExpressions.hh"
+#include "../include/bandSubstract.hh"
 
 template <typename T>
 void defaultPrinter(std::vector<T> &vec)
@@ -93,6 +95,23 @@ void _init_matta(Pr135Experimental &nucleus, EnergyFormula &formulas)
 
     // nucleus.mathPrinter(nucleus.band1);
     // nucleus.mathPrinter(nucleus.band2);
+}
+
+template <typename Arg, typename... Args>
+void doPrint(std::ostream &out, Arg &&arg, Args &&... args)
+{
+    out << std::forward<Arg>(arg);
+    ((out << ' ' << ',' << ' ' << std::forward<Args>(args)), ...);
+    out << "\n";
+}
+
+void showSumComponets(EnergyFormula::triplet &triplet)
+{
+    /* 
+    std::cout << "A1j1= " << triplet.firstSumComponent << " A2j2= " << triplet.secondSumComponent << " S_Aj= " << triplet.totalsum;
+    std::cout << "\n";
+ */
+    doPrint(std::cout, triplet.firstSumComponent, triplet.secondSumComponent, triplet.totalsum);
 }
 
 void testForComplexValue_yrast()
@@ -247,20 +266,58 @@ int main()
     double paramsImported[5] = {52.0588, 19.9804, 6.4409, 15.977};
 
     //initialize the containers with the experimental data from ENSDF
-    _init(*nucleus, *formulas);
+    // _init(*nucleus, *formulas);
     // std::cout << paramSet->calculateMinimumValue<double>(*nucleus, *formulas, *chisquared);
 
     //initialize the containers with the experimental data from MATTA
     // _init_matta(*nucleus, *formulas);
-    std::cout << paramSet->calculateMinimumValue<double>(*nucleus, *formulas, *chisquared);
+
+    // std::cout << paramSet->calculateMinimumValue<double>(*nucleus, *formulas, *chisquared);
+
     // std::cout << chisquared->applyEnergies<double>(*nucleus, EnergyFormula::inertiaFactor(paramsImported[0]), EnergyFormula::inertiaFactor(paramsImported[1]), EnergyFormula::inertiaFactor(paramsImported[2]), EnergyFormula::inertiaFactor(paramsImported[3]));
     // std::cout << chisquared->applyRawEnergies<double>(paramsImported[0], paramsImported[1], paramsImported[2], paramsImported[3]);
+
+    //############################################################
+    //############################################################
+    //############################################################
+    //############################################################
+    //############################################################
+    //testing the band substraction method
+    BandSubstract::testApp_Substraction();
+    BandSubstract::smartPointerTest();
+    //############################################################
+    //############################################################
+    //############################################################
+    //############################################################
+    //############################################################
+    //test for the squared sum
+    {
+        auto I1 = 100;
+        auto I2 = 10;
+        auto I3 = 40;
+
+        //no need for transformation of the moments of inertia
+
+        auto A1 = EnergyFormula::inertiaFactor(static_cast<double>(I1));
+        auto A2 = EnergyFormula::inertiaFactor(static_cast<double>(I2));
+        auto A3 = EnergyFormula::inertiaFactor(static_cast<double>(I3));
+
+        // auto theta = 0;
+        for (auto theta = 0; theta <= 180; theta += 10.0)
+        {
+            auto x = EnergyFormula::singleParticleSum(theta, I1, I2, I3);
+            // showSumComponets(x);
+        }
+    }
+    auto summer = EnergyFormula::singleParticleSum(0, 1, 1, 1);
+    // doPrint(std::cout, "x", EnergyFormula::singleParticleSum(0, 1, 1, 1));
 
     for (auto &&n : nucleus->band1)
     {
         auto I1 = 100;
         auto I2 = 10;
         auto I3 = 40;
+
         auto A1 = EnergyFormula::inertiaFactor(static_cast<double>(I1));
         auto A2 = EnergyFormula::inertiaFactor(static_cast<double>(I2));
         auto A3 = EnergyFormula::inertiaFactor(static_cast<double>(I3));
