@@ -283,7 +283,7 @@ int main()
     //############################################################
     //############################################################
     //testing the band substraction method
-    BandSubstract::testApp_Substraction();
+    // BandSubstract::testApp_Substraction();
     BandSubstract::smartPointerTest();
     //############################################################
     //############################################################
