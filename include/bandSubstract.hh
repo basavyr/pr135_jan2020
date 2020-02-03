@@ -7,6 +7,7 @@
 #include <string>
 #include <utility>
 #include <memory>
+#include <cmath>
 #include <fstream>
 
 class Data_ENSDF
@@ -28,8 +29,17 @@ public:
 public:
     std::vector<double> spin1 = {7.5, 9.5, 11.5, 13.5, 15.5, 17.5, 19.5, 21.5, 23.5, 25.5};
     std::vector<double> spin2 = {8.5, 10.5, 12.5, 14.5, 16.5};
-    std::vector<double> yrastExp = {358.06, 730.83, 1390.9, 2244.9, 3244.8, 4319.8, 5163.8, 5997.8, 6879.8, 7802.8, 8716};
-    std::vector<double> wobbExp = {1433.3, 2158.5, 3001.0, 3957.0, 5069.0};
+    std::vector<double> yrastExp = {0.37277, 1.03284, 1.88684, 2.88674, 3.96174, 4.80574, 5.63974,
+                                    6.52174, 7.44474, 8.35794};
+    std::vector<double> wobbExp = {1.07524, 1.80044, 2.64294, 3.59894, 4.71094};
+
+    //containers to hold the substracted energies
+    std::vector<double> yrastExp_Sub;
+    std::vector<double> wobExp_Sub;
+
+    //containers for storing the theoretical energies (obtained after the best root mean square)
+    std::vector<double> yrastTh;
+    std::vector<double> wobblingTh;
 };
 
 class Data_MATTA
@@ -42,6 +52,14 @@ public:
     std::vector<double> spin2 = {};
     std::vector<double> yrastExp = {};
     std::vector<double> wobbExp = {};
+
+    //containers to hold the substracted energies
+    std::vector<double> yrastExp_Sub;
+    std::vector<double> wobExp_Sub;
+
+    //containers for storing the theoretical energies (obtained after the best root mean square)
+    std::vector<double> yrastTh;
+    std::vector<double> wobblingTh;
 };
 
 class BandSubstract
@@ -55,7 +73,8 @@ public:
     //the useful formulae for calculus
 public:
     static void testApp_Substraction();
-    static void smartPointerTest();
+    static void smartPointerTest(double);
+
     template <typename T>
     static void arrayPrinter(std::vector<T> &array)
     {
@@ -69,6 +88,7 @@ public:
             }
         }
     }
+
     template <typename T>
     static void generatePlotData(const std::string &filename, std::vector<T> &spin, std::vector<T> &energy, std::vector<T> &energyAdjusted)
     {
@@ -78,6 +98,44 @@ public:
             fout << spin.at(i) << " " << energy.at(i) << " " << energyAdjusted.at(i) << "\n";
         }
     }
+    
+    template <typename T>
+    static void bandSubstracter(std::vector<T> &object, std::vector<T> &newObject, double subtractor)
+    {
+        auto halfSize = static_cast<size_t>(object.size() / 2);
+        for (int i = 0; i < object.size(); ++i)
+        {
+            if (i < halfSize)
+            {
+                newObject.emplace_back(object.at(i) - subtractor);
+            }
+            else
+            {
+                newObject.emplace_back(object.at(i));
+            }
+        }
+        // std::cout << "the half band is of length= " << halfSize;
+        // std::cout << "\n";
+    }
 };
+
+class EnergyFormulae
+{
+public:
+    //calculates the obbling frequency of the nucleus
+    static double omega(double spin, double i1, double i2, double i3, double theta);
+
+    //calculates the wobbling frequency of the nucleus without the single particle term in the total hamiltonian
+    static double omegaPrime(double spin, double i1, double i2, double i3, double theta);
+
+    //returns the energy calculation of an arbitrary spin state from a band
+    static double energyExpression(int N, double spin, double i2, double i2, double i3, double theta);
+
+    //tranforms the moments of inertia into inertia factors A_k
+    static double inertiaFactor(double moi);
+
+    //computes the components of the single particle angular momentum
+    static double j_Component(int k, double theta);
+}
 
 #endif // BANDSUBSTRACT_HH
