@@ -284,12 +284,29 @@ int main()
     //############################################################
     //testing the band substraction method
     // BandSubstract::testApp_Substraction();
+    /* BandSubstract::smartPointerTest(-0.6);
+    BandSubstract::smartPointerTest(-0.5);
+    BandSubstract::smartPointerTest(-0.4);
+    BandSubstract::smartPointerTest(-0.3);
+     */
+    // BandSubstract::smartPointerTest(-0.2);
+    // BandSubstract::smartPointerTest(-0.1);
     BandSubstract::smartPointerTest(0.1);
+    BandSubstract::smartPointerTest(0.0);
+    // BandSubstract::smartPointerTest(0.2);
+    /*  BandSubstract::smartPointerTest(0.3);
+    BandSubstract::smartPointerTest(0.4);
+    BandSubstract::smartPointerTest(0.5);
+    BandSubstract::smartPointerTest(0.6);
+    BandSubstract::smartPointerTest(0.7);
+    BandSubstract::smartPointerTest(0.8);
+    */
     //############################################################
     //############################################################
     //############################################################
     //############################################################
     //############################################################
+
     //test for the squared sum
     {
         auto I1 = 100;

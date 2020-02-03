@@ -121,7 +121,12 @@ public:
 
     //generate the full data set for RMS calculation
     //prepare the data for FIT
-    static double bandGeneration(Data_ENSDF &, double, double, double, double);
+    struct rms_Tuple
+    {
+        double rms_substracted;
+        double rms_pure;
+    };
+    static rms_Tuple bandGeneration(Data_ENSDF &, double, double, double, double);
 };
 
 class EnergyFormulae
@@ -154,8 +159,12 @@ public:
     {
         double i1_min, i2_min, i3_min;
         double theta_min;
+        //the rms calculated with the substracted energies
         double rms;
+        //rms calculated with the pure experimental energies
+        double pure_rms;
     };
+
     //the set of limits for fitting params (moments of inertia and the single particle angle)
     struct paramsLimits
     {
@@ -164,11 +173,19 @@ public:
         const double i_step = 5.0;
         const double theta_left = 0.0;
         const double theta_right = 180.0;
-        const double theta_step = 10.0;
+        const double theta_step = 5.0;
     };
     std::vector<minParamSet> minimalParameters;
 
 public:
+    //rms calculation for any arbitrary energy containers
+    template <typename T>
+    static double pure_RootMeanSquare(std::vector<T> &exp, std::vector<T> &th)
+    {
+        return rootMeanSquare<T>(&exp, &th);
+    }
+
+    //root mean square error calculation for the SUBSTRACTED energy containers
     template <typename T>
     static double rootMeanSquare(std::vector<T> &exp, std::vector<T> &th)
     {
@@ -190,6 +207,7 @@ public:
             return rms;
         return 6969;
     }
+
     //search for the minimal set of parameters after the substraction of the bands with a fixed quantity.
     template <typename T>
     static void searchMinimum(T &object, minParamSet &bestParams)
@@ -214,7 +232,8 @@ public:
                             minSetOfParams.at(index).i2_min = I2;
                             minSetOfParams.at(index).i3_min = I3;
                             minSetOfParams.at(index).theta_min = theta;
-                            RMS_stack.emplace_back(currentRMS);
+                            minSetOfParams.at(index).pure_rms = currentRMS.rms_pure;
+                            RMS_stack.emplace_back(currentRMS.rms_substracted);
                             index++;
                         }
                     }
@@ -226,7 +245,20 @@ public:
         bestParams.i2_min = minSetOfParams.at(minIndex).i2_min;
         bestParams.i3_min = minSetOfParams.at(minIndex).i3_min;
         bestParams.theta_min = minSetOfParams.at(minIndex).theta_min;
+        bestParams.pure_rms = minSetOfParams.at(minIndex).pure_rms;
         bestParams.rms = RMS_stack.at(minIndex);
+    }
+
+    template <typename T>
+    static void paramPrinter(T &params)
+    {
+        std::cout << "The best fit parameters are"
+                  << "\n";
+        std::cout << "I1= " << params.i1_min << " I2= " << params.i2_min << " I3= " << params.i3_min << " th= " << params.theta_min << "\n";
+        std::cout << "E_RMS= " << params.rms;
+        std::cout << std::endl;
+        std::cout << "E_RMS_pure= " << params.pure_rms;
+        std::cout << std::endl;
     }
 };
 

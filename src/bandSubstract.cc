@@ -58,12 +58,13 @@ void BandSubstract::smartPointerTest(double subtractor)
     std::string wobblingFile = "../output/wobblingBand.dat";
     bandSubstracter<double>(yrast, smartPtr->yrastExp_Sub, subtractor);
     bandSubstracter<double>(wobbling, smartPtr->wobExp_Sub, subtractor);
-    generatePlotData(yrastFile, smartPtr->spin1, yrast, smartPtr->yrastExp_Sub);
-    generatePlotData(wobblingFile, smartPtr->spin2, wobbling, smartPtr->wobExp_Sub);
+    // generatePlotData(yrastFile, smartPtr->spin1, yrast, smartPtr->yrastExp_Sub);
+    // generatePlotData(wobblingFile, smartPtr->spin2, wobbling, smartPtr->wobExp_Sub);
     // arrayPrinter(smartPtr->yrastExp_Sub);
     // arrayPrinter(smartPtr->wobExp_Sub);
     // bandGeneration(*smartPtr, 1, 1, 1, 1);
     RMS_Calculus::searchMinimum<Data_ENSDF>(*smartPtr, *bestParams);
+    RMS_Calculus::paramPrinter<RMS_Calculus::minParamSet>(*bestParams);
 }
 
 // Data_ENSDF::Data_ENSDF()
@@ -86,18 +87,22 @@ Data_ENSDF::~Data_ENSDF()
 {
     std::string destructorMessage = "Class containers has been succsesfully destroyed";
     std::cout << destructorMessage;
+    std::cout << "\n";
+    std::cout << "*********************************************";
     std::cout << std::endl;
 }
 
-double BandSubstract::bandGeneration(Data_ENSDF &object, double i1, double i2, double i3, double theta)
+BandSubstract::rms_Tuple BandSubstract::bandGeneration(Data_ENSDF &object, double i1, double i2, double i3, double theta)
 {
     auto yrast = [&](auto spin) { return EnergyFormulae::energyExpression(0, spin, i1, i2, i3, theta); };
     auto wobbling = [&](auto spin) { return EnergyFormulae::energyExpression(0, spin, i1, i2, i3, theta); };
     std::vector<double> dataExp;
+    std::vector<double> dataExp_pure;
     std::vector<double> dataTh;
     for (int i = 0; i < object.yrastExp_Sub.size(); ++i)
     {
         dataExp.emplace_back(object.yrastExp_Sub.at(i));
+        dataExp_pure.emplace_back(object.yrastExp.at(i));
         auto currentValue = yrast(object.spin1.at(i));
         if (currentValue == 6969)
         {
@@ -112,6 +117,7 @@ double BandSubstract::bandGeneration(Data_ENSDF &object, double i1, double i2, d
     for (int i = 0; i < object.wobExp_Sub.size(); ++i)
     {
         dataExp.emplace_back(object.wobExp_Sub.at(i));
+        dataExp_pure.emplace_back(object.wobbExp.at(i));
         auto currentValue = wobbling(object.spin2.at(i));
         if (currentValue == 6969)
         {
@@ -125,7 +131,12 @@ double BandSubstract::bandGeneration(Data_ENSDF &object, double i1, double i2, d
     }
     // dataExp.clear();
     // dataTh.clear();
-    return RMS_Calculus::rootMeanSquare(dataExp, dataTh);
+    auto rms_subtracted = RMS_Calculus::rootMeanSquare(dataExp, dataTh);
+    auto rms_pure = RMS_Calculus::rootMeanSquare(dataExp_pure, dataTh);
+    rms_Tuple result;
+    result.rms_substracted = rms_subtracted;
+    result.rms_pure = rms_pure;
+    return result;
     // arrayPrinter(dataExp);
     // arrayPrinter(dataTh);
     // std::cout << std::endl;
