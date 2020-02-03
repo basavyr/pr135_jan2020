@@ -98,7 +98,7 @@ public:
             fout << spin.at(i) << " " << energy.at(i) << " " << energyAdjusted.at(i) << "\n";
         }
     }
-    
+
     template <typename T>
     static void bandSubstracter(std::vector<T> &object, std::vector<T> &newObject, double subtractor)
     {
@@ -114,9 +114,14 @@ public:
                 newObject.emplace_back(object.at(i));
             }
         }
+
         // std::cout << "the half band is of length= " << halfSize;
         // std::cout << "\n";
     }
+
+    //generate the full data set for RMS calculation
+    //prepare the data for FIT
+    static double bandGeneration(Data_ENSDF &, double, double, double, double);
 };
 
 class EnergyFormulae
@@ -129,13 +134,100 @@ public:
     static double omegaPrime(double spin, double i1, double i2, double i3, double theta);
 
     //returns the energy calculation of an arbitrary spin state from a band
-    static double energyExpression(int N, double spin, double i2, double i2, double i3, double theta);
+    static double energyExpression(int N, double spin, double i1, double i2, double i3, double theta);
 
     //tranforms the moments of inertia into inertia factors A_k
     static double inertiaFactor(double moi);
 
     //computes the components of the single particle angular momentum
     static double j_Component(int k, double theta);
-}
+
+    //returns the minimal term from the hamiltonian: term independent on the wobbling frequency
+    static double minHamiltonian(double spin, double i1, double i2, double i3, double theta);
+};
+
+class RMS_Calculus
+{
+public:
+    //the set of parameters
+    struct minParamSet
+    {
+        double i1_min, i2_min, i3_min;
+        double theta_min;
+        double rms;
+    };
+    //the set of limits for fitting params (moments of inertia and the single particle angle)
+    struct paramsLimits
+    {
+        const double i_left = 1.0;
+        const double i_right = 120.0;
+        const double i_step = 5.0;
+        const double theta_left = 0.0;
+        const double theta_right = 180.0;
+        const double theta_step = 10.0;
+    };
+    std::vector<minParamSet> minimalParameters;
+
+public:
+    template <typename T>
+    static double rootMeanSquare(std::vector<T> &exp, std::vector<T> &th)
+    {
+        if (exp.size() != th.size())
+            return 6969;
+        double sum = 0;
+        int dimCheck = 0;
+        for (int i = 0; i < exp.size(); ++i)
+        {
+            auto currentValue = pow(exp.at(i) - th.at(i), 2);
+            if (!isnan(currentValue))
+            {
+                dimCheck++;
+                sum += currentValue;
+            }
+        }
+        auto rms = static_cast<double>(sqrt(1.0 / exp.size() * sum));
+        if (!isnan(rms) && dimCheck == exp.size())
+            return rms;
+        return 6969;
+    }
+    //search for the minimal set of parameters after the substraction of the bands with a fixed quantity.
+    template <typename T>
+    static void searchMinimum(T &object, minParamSet &bestParams)
+    {
+        auto limits = std::make_unique<paramsLimits>();
+        std::vector<minParamSet> minSetOfParams;
+        std::vector<double> RMS_stack;
+        int index = 0;
+        for (auto I1 = limits->i_left; I1 < limits->i_right; I1 += limits->i_step)
+        {
+            for (auto I2 = limits->i_left; I2 < limits->i_right; I2 += limits->i_step)
+            {
+                for (auto I3 = limits->i_left; I3 < limits->i_right; I3 += limits->i_step)
+                {
+                    for (auto theta = limits->theta_left; theta < limits->theta_right; theta += limits->theta_step)
+                    {
+                        auto currentRMS = BandSubstract::bandGeneration(object, I1, I2, I3, theta);
+                        // if (!isnan(currentRMS) && currentRMS != 6969)
+                        {
+                            minSetOfParams.emplace_back(minParamSet());
+                            minSetOfParams.at(index).i1_min = I1;
+                            minSetOfParams.at(index).i2_min = I2;
+                            minSetOfParams.at(index).i3_min = I3;
+                            minSetOfParams.at(index).theta_min = theta;
+                            RMS_stack.emplace_back(currentRMS);
+                            index++;
+                        }
+                    }
+                }
+            }
+        }
+        auto minIndex = std::distance(RMS_stack.begin(), std::min_element(RMS_stack.begin(), RMS_stack.end()));
+        bestParams.i1_min = minSetOfParams.at(minIndex).i1_min;
+        bestParams.i2_min = minSetOfParams.at(minIndex).i2_min;
+        bestParams.i3_min = minSetOfParams.at(minIndex).i3_min;
+        bestParams.theta_min = minSetOfParams.at(minIndex).theta_min;
+        bestParams.rms = RMS_stack.at(minIndex);
+    }
+};
 
 #endif // BANDSUBSTRACT_HH
