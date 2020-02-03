@@ -14,6 +14,7 @@ void BandSubstract::testApp_Substraction()
 
 void BandSubstract::smartPointerTest(double subtractor)
 {
+    auto startTime = std::chrono::system_clock::now();
     //create the subtracted energy set
     auto smartPtr = std::make_unique<Data_ENSDF>(subtractor);
     //create the set for storing best fit params
@@ -65,6 +66,10 @@ void BandSubstract::smartPointerTest(double subtractor)
     // bandGeneration(*smartPtr, 1, 1, 1, 1);
     RMS_Calculus::searchMinimum<Data_ENSDF>(*smartPtr, *bestParams);
     RMS_Calculus::paramPrinter<RMS_Calculus::minParamSet>(*bestParams);
+    auto endTime = std::chrono::system_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+    std::cout << "Process took: " << static_cast<double>(duration / 1000.0) << " seconds"
+              << "\n";
 }
 
 // Data_ENSDF::Data_ENSDF()
@@ -150,8 +155,8 @@ double EnergyFormulae::inertiaFactor(double moi)
 double EnergyFormulae::j_Component(int k, double theta)
 {
     if (k == 1)
-        return BandSubstract::j_singleParticle * cos(theta * BandSubstract::PI / 180.00);
-    return BandSubstract::j_singleParticle * sin(theta * BandSubstract::PI / 180);
+        return BandSubstract::j_singleParticle * cos(theta * BandSubstract::PI / 180.0);
+    return BandSubstract::j_singleParticle * sin(theta * BandSubstract::PI / 180.0);
 }
 
 double EnergyFormulae::omega(double spin, double i1, double i2, double i3, double theta)
@@ -214,11 +219,16 @@ double EnergyFormulae::energyExpression(int N, double spin, double i1, double i2
     //stop immediately if the wobbling frequency is not real
     if (omega == 6969)
         return 6969;
+
+    //generate the first state (band head)
+    auto spinZero = 5.5;
+    auto e0 = static_cast<double>(minHamiltonian(spinZero, i1, i2, i3, theta) + 0.5 * EnergyFormulae::omega(spinZero, i1, i2, i3, theta));
+
     //generate the inertia factors
     auto a1 = inertiaFactor(i1);
     auto a2 = inertiaFactor(i2);
     auto a3 = inertiaFactor(i3);
-    auto result = static_cast<double>(minHamiltonian(spin, i1, i2, i3, theta) + (N + 0.5) * EnergyFormulae::omega(spin, i1, i2, i3, theta));
+    auto result = static_cast<double>(minHamiltonian(spin, i1, i2, i3, theta) + (N + 0.5) * EnergyFormulae::omega(spin, i1, i2, i3, theta) - e0);
     if (isnan(result))
         return 6969;
     return static_cast<double>(result);
