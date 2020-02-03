@@ -73,7 +73,7 @@ public:
     //the useful formulae for calculus
 public:
     static void testApp_Substraction();
-    static void smartPointerTest(double);
+    static void smartPointerTest(double, std::ofstream &);
 
     template <typename T>
     static void arrayPrinter(std::vector<T> &array)
@@ -170,10 +170,10 @@ public:
     {
         const double i_left = 1.0;
         const double i_right = 120.0;
-        const double i_step = 5.0;
+        const double i_step = 1.0;
         const double theta_left = 0.0;
         const double theta_right = 180.0;
-        const double theta_step = 5.0;
+        const double theta_step = 1.0;
     };
     std::vector<minParamSet> minimalParameters;
 
@@ -250,15 +250,18 @@ public:
     }
 
     template <typename T>
-    static void paramPrinter(T &params)
+    static void paramPrinter(std::ofstream &out, T &params)
     {
         std::cout << "The best fit parameters are"
                   << "\n";
+        out << "The best fit parameters are"
+            << "\n";
         std::cout << "I1= " << params.i1_min << " I2= " << params.i2_min << " I3= " << params.i3_min << " th= " << params.theta_min << "\n";
-        std::cout << "E_RMS= " << params.rms;
-        std::cout << std::endl;
-        std::cout << "E_RMS_pure= " << params.pure_rms;
-        std::cout << std::endl;
+        out << "I1= " << params.i1_min << " I2= " << params.i2_min << " I3= " << params.i3_min << " th= " << params.theta_min << "\n";
+        std::cout << "E_RMS= " << params.rms << "\n";
+        out << "E_RMS= " << params.rms << "\n";
+        std::cout << "E_RMS_pure= " << params.pure_rms << "\n";
+        out << "E_RMS_pure= " << params.pure_rms << "\n";
     }
 };
 

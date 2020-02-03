@@ -284,23 +284,28 @@ int main()
     //############################################################
     //testing the band substraction method
     // BandSubstract::testApp_Substraction();
-    /* BandSubstract::smartPointerTest(-0.6);
-    BandSubstract::smartPointerTest(-0.5);
-    BandSubstract::smartPointerTest(-0.4);
-    BandSubstract::smartPointerTest(-0.3);
-     */
-    // BandSubstract::smartPointerTest(-0.2);
-    // BandSubstract::smartPointerTest(-0.1);
-    BandSubstract::smartPointerTest(0.1);
-    BandSubstract::smartPointerTest(0.0);
-    // BandSubstract::smartPointerTest(0.2);
-    /*  BandSubstract::smartPointerTest(0.3);
-    BandSubstract::smartPointerTest(0.4);
-    BandSubstract::smartPointerTest(0.5);
-    BandSubstract::smartPointerTest(0.6);
-    BandSubstract::smartPointerTest(0.7);
-    BandSubstract::smartPointerTest(0.8);
-    */
+    std::ofstream out("../output/bestParams.dat");
+    BandSubstract::smartPointerTest(-1.0, out);
+    BandSubstract::smartPointerTest(-0.9, out);
+    BandSubstract::smartPointerTest(-0.8, out);
+    BandSubstract::smartPointerTest(-0.7, out);
+    BandSubstract::smartPointerTest(-0.6, out);
+    BandSubstract::smartPointerTest(-0.5, out);
+    BandSubstract::smartPointerTest(-0.4, out);
+    BandSubstract::smartPointerTest(-0.3, out);
+    BandSubstract::smartPointerTest(-0.2, out);
+    BandSubstract::smartPointerTest(-0.1, out);
+    BandSubstract::smartPointerTest(0.0, out);
+    BandSubstract::smartPointerTest(0.1, out);
+    BandSubstract::smartPointerTest(0.2, out);
+    BandSubstract::smartPointerTest(0.3, out);
+    BandSubstract::smartPointerTest(0.4, out);
+    BandSubstract::smartPointerTest(0.5, out);
+    BandSubstract::smartPointerTest(0.6, out);
+    BandSubstract::smartPointerTest(0.7, out);
+    BandSubstract::smartPointerTest(0.8, out);
+    BandSubstract::smartPointerTest(0.9, out);
+    BandSubstract::smartPointerTest(1.0, out);
     //############################################################
     //############################################################
     //############################################################

@@ -12,7 +12,7 @@ void BandSubstract::testApp_Substraction()
 
 //testing the smart pointers
 
-void BandSubstract::smartPointerTest(double subtractor)
+void BandSubstract::smartPointerTest(double subtractor, std::ofstream &out)
 {
     auto startTime = std::chrono::system_clock::now();
     //create the subtracted energy set
@@ -57,6 +57,9 @@ void BandSubstract::smartPointerTest(double subtractor)
 
     std::string yrastFile = "../output/yrastBand.dat";
     std::string wobblingFile = "../output/wobblingBand.dat";
+
+    //file for storing the best params per each substractor
+
     bandSubstracter<double>(yrast, smartPtr->yrastExp_Sub, subtractor);
     bandSubstracter<double>(wobbling, smartPtr->wobExp_Sub, subtractor);
     // generatePlotData(yrastFile, smartPtr->spin1, yrast, smartPtr->yrastExp_Sub);
@@ -65,7 +68,10 @@ void BandSubstract::smartPointerTest(double subtractor)
     // arrayPrinter(smartPtr->wobExp_Sub);
     // bandGeneration(*smartPtr, 1, 1, 1, 1);
     RMS_Calculus::searchMinimum<Data_ENSDF>(*smartPtr, *bestParams);
-    RMS_Calculus::paramPrinter<RMS_Calculus::minParamSet>(*bestParams);
+    RMS_Calculus::paramPrinter<RMS_Calculus::minParamSet>(out, *bestParams);
+    out << "Subtractor value was: " << subtractor << "\n";
+    out << "***********************************************"
+        << "\n";
     auto endTime = std::chrono::system_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
     std::cout << "Process took: " << static_cast<double>(duration / 1000.0) << " seconds"
